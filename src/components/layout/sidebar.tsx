@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -55,10 +56,15 @@ export function Sidebar({ open, onClose, className }: SidebarProps) {
         )}
       >
         <div className="flex h-16 items-center justify-between px-6">
-          <Link href="/dashboard" className="flex items-center gap-1.5">
-            <span className="text-lg font-semibold italic text-neutral-900">
-              {BRAND.name}
-            </span>
+          <Link href="/dashboard" className="flex items-center">
+            <Image
+              src="/patronflowlogo.png"
+              alt={BRAND.name}
+              width={1297}
+              height={375}
+              priority
+              className="h-auto w-40"
+            />
           </Link>
           {onClose && (
             <Button

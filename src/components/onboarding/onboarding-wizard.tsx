@@ -113,10 +113,10 @@ export function OnboardingWizard({
         <Image
           src="/patronflowlogo.png"
           alt={`${BRAND.name} — ${BRAND.tagline}`}
-          width={220}
-          height={147}
+          width={1297}
+          height={375}
           priority
-          className="h-auto w-44"
+          className="h-auto w-48"
         />
       </div>
 

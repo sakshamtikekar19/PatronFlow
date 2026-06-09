@@ -13,8 +13,8 @@ export default function AuthLayout({
           <Image
             src="/patronflowlogo.png"
             alt={`${BRAND.name} — ${BRAND.tagline}`}
-            width={280}
-            height={187}
+            width={1297}
+            height={375}
             priority
             className="h-auto w-64"
           />
