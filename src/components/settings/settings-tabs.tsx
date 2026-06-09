@@ -17,6 +17,7 @@ import {
   User,
   AlertTriangle,
   Printer,
+  Download,
   ArrowRight,
   LogOut,
 } from "lucide-react";
@@ -45,7 +46,7 @@ import {
 } from "@/lib/actions/settings";
 import { logout } from "@/lib/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { printQrPoster } from "@/lib/print-poster";
+import { printQrPoster, downloadQrPoster } from "@/lib/print-poster";
 import { CUISINE_TYPES } from "@/types";
 import { cn } from "@/lib/utils";
 import type { Restaurant } from "@/types";
@@ -346,6 +347,21 @@ export function SettingsTabs({
               >
                 <Printer className="mr-2 h-4 w-4" />
                 Print QR Poster
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  downloadQrPoster({
+                    restaurantName: restaurant.name,
+                    url: reviewUrl,
+                    restaurantLogo: logoUrl,
+                  })
+                }
+                className="rounded-xl border-neutral-200"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download Poster
               </Button>
               <Button
                 render={<Link href="/qr" />}
