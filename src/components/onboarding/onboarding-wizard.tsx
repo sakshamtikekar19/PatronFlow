@@ -299,6 +299,7 @@ export function OnboardingWizard({
                   printQrPoster({
                     restaurantName: name || restaurant.name,
                     url: reviewUrl,
+                    restaurantLogo: logoUrl || restaurant.logo,
                   })
                 }
                 className="h-11 rounded-xl border-neutral-200"

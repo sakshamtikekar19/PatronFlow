@@ -336,7 +336,11 @@ export function SettingsTabs({
                 type="button"
                 variant="outline"
                 onClick={() =>
-                  printQrPoster({ restaurantName: restaurant.name, url: reviewUrl })
+                  printQrPoster({
+                    restaurantName: restaurant.name,
+                    url: reviewUrl,
+                    restaurantLogo: logoUrl,
+                  })
                 }
                 className="rounded-xl border-neutral-200"
               >
