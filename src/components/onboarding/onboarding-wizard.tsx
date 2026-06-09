@@ -109,6 +109,17 @@ export function OnboardingWizard({
 
   return (
     <div className="w-full max-w-lg">
+      <div className="mb-6 flex justify-center">
+        <Image
+          src="/patronflowlogo.png"
+          alt={`${BRAND.name} — ${BRAND.tagline}`}
+          width={220}
+          height={147}
+          priority
+          className="h-auto w-44"
+        />
+      </div>
+
       {/* Stepper */}
       <div className="mb-8 flex items-center justify-center gap-2">
         {STEPS.map((label, i) => (
