@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   CalendarDays,
   Plus,
@@ -10,6 +11,9 @@ import {
   Users,
   ExternalLink,
   MoreHorizontal,
+  Upload,
+  ImageIcon,
+  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +24,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChartCard } from "@/components/chart-card";
 import { StatCard } from "@/components/stat-card";
 import { EmptyState } from "@/components/empty-state";
+import { QrCodeCard } from "@/components/qr/qr-code-card";
 import { EventGrowthChart } from "@/components/charts/event-growth-chart";
+import { buildEventUrl } from "@/lib/review-url";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +53,7 @@ import {
   deleteEvent,
   setEventStatus,
   toggleRsvpAttendance,
+  uploadEventCover,
 } from "@/lib/actions/events";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -93,11 +100,41 @@ export function EventsPageClient({
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  // QR dialog
+  const [qrEvent, setQrEvent] = useState<EventWithStats | null>(null);
 
   // RSVP panel
   const [rsvpEvent, setRsvpEvent] = useState<EventWithStats | null>(null);
   const [rsvps, setRsvps] = useState<EventRsvp[]>([]);
   const [rsvpLoading, setRsvpLoading] = useState(false);
+
+  const handleCoverChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file) return;
+
+    setIsUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append("cover", file);
+      const res = await uploadEventCover(formData);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      if (res.coverUrl) {
+        setCoverImage(res.coverUrl);
+        toast.success("Image uploaded");
+      }
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
 
   const openCreate = () => {
     setEditingId(null);
@@ -339,20 +376,30 @@ export function EventsPageClient({
                       Manage RSVPs
                     </Button>
                     {e.status !== "draft" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        render={
-                          <Link
-                            href={`/events/${e.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          />
-                        }
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        View page
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setQrEvent(e)}
+                        >
+                          <QrCode className="h-3.5 w-3.5" />
+                          QR code
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          render={
+                            <Link
+                              href={`/events/${e.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            />
+                          }
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          View page
+                        </Button>
+                      </>
                     )}
                   </div>
                 </CardContent>
@@ -395,13 +442,60 @@ export function EventsPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="event-cover">Cover image URL (optional)</Label>
-              <Input
-                id="event-cover"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="https://..."
+              <Label>Cover image (optional)</Label>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleCoverChange}
               />
+              {coverImage ? (
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={coverImage}
+                    alt="Cover preview"
+                    width={96}
+                    height={64}
+                    unoptimized
+                    className="h-16 w-24 rounded-lg object-cover"
+                  />
+                  <div className="flex flex-col gap-1.5">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploadingCover}
+                      onClick={() => coverInputRef.current?.click()}
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      {isUploadingCover ? "Uploading..." : "Change"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCoverImage("")}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  disabled={isUploadingCover}
+                  onClick={() => coverInputRef.current?.click()}
+                  className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 py-5 text-sm text-neutral-500 transition hover:border-neutral-400 hover:bg-neutral-100 disabled:opacity-60"
+                >
+                  <ImageIcon className="h-5 w-5" />
+                  {isUploadingCover ? "Uploading..." : "Upload a photo"}
+                  <span className="text-xs text-neutral-400">
+                    PNG, JPG or WEBP · up to 5MB
+                  </span>
+                </button>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="event-desc">Description (optional)</Label>
@@ -422,6 +516,32 @@ export function EventsPageClient({
               {isPending ? "Saving..." : editingId ? "Save changes" : "Create"}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* QR code dialog */}
+      <Dialog
+        open={qrEvent !== null}
+        onOpenChange={(open) => !open && setQrEvent(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Event QR code</DialogTitle>
+            <DialogDescription>
+              Guests can scan this code to open the RSVP page for{" "}
+              {qrEvent?.title}. Print it for tables, posters, or share it
+              online.
+            </DialogDescription>
+          </DialogHeader>
+          {qrEvent && (
+            <QrCodeCard
+              url={buildEventUrl(qrEvent.id)}
+              title={qrEvent.title}
+              subtitle="Scan to RSVP"
+              filename={`event-${qrEvent.title}`}
+              className="shadow-none"
+            />
+          )}
         </DialogContent>
       </Dialog>
 

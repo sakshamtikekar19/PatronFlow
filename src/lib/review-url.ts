@@ -14,3 +14,8 @@ export function buildReviewUrl(
   if (!tableName) return base;
   return `${base}?table=${encodeURIComponent(tableName)}`;
 }
+
+/** Build the public RSVP page URL for an event (QR destination). */
+export function buildEventUrl(eventId: string): string {
+  return `${getBaseUrl()}/events/${eventId}`;
+}

@@ -24,6 +24,7 @@ export default async function PublicEventPage({
           title={event.title}
           description={event.description}
           eventDate={event.event_date}
+          coverImage={event.cover_image}
           restaurantName={event.restaurant.name}
           restaurantLogo={event.restaurant.logo}
         />

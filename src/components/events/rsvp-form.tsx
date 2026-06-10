@@ -13,6 +13,7 @@ interface RsvpFormProps {
   title: string;
   description?: string | null;
   eventDate?: string | null;
+  coverImage?: string | null;
   restaurantName: string;
   restaurantLogo?: string | null;
 }
@@ -22,6 +23,7 @@ export function RsvpForm({
   title,
   description,
   eventDate,
+  coverImage,
   restaurantName,
   restaurantLogo,
 }: RsvpFormProps) {
@@ -79,6 +81,18 @@ export function RsvpForm({
 
   return (
     <div className="space-y-6">
+      {coverImage && (
+        <div className="-mx-6 -mt-6 mb-2 overflow-hidden sm:-mx-8 sm:-mt-8">
+          <Image
+            src={coverImage}
+            alt={title}
+            width={800}
+            height={320}
+            unoptimized
+            className="h-44 w-full object-cover sm:h-52"
+          />
+        </div>
+      )}
       <div className="space-y-3 text-center">
         {restaurantLogo ? (
           <Image
@@ -86,6 +100,7 @@ export function RsvpForm({
             alt={restaurantName}
             width={56}
             height={56}
+            unoptimized
             className="mx-auto h-14 w-14 rounded-full object-cover"
           />
         ) : (
