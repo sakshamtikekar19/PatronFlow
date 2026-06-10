@@ -22,12 +22,24 @@ export default function GlobalError({
         }}
       >
         <div style={{ textAlign: "center", maxWidth: 420 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/patronflowlogo.png"
+            alt="PatronFlow"
+            style={{ height: 40, width: "auto", margin: "0 auto 24px" }}
+          />
           <h2 style={{ fontSize: 20, fontWeight: 600, color: "#0a0a0a" }}>
             Something went wrong
           </h2>
-          <p style={{ marginTop: 8, color: "#6b7280", fontSize: 14 }}>
-            {error.message || "An unexpected error occurred."}
+          <p style={{ marginTop: 8, color: "#6b7280", fontSize: 14, lineHeight: 1.5 }}>
+            We hit an unexpected error. Please try again — if it keeps happening,
+            refresh the page in a moment.
           </p>
+          {error.digest && (
+            <p style={{ marginTop: 8, color: "#9ca3af", fontSize: 12 }}>
+              Reference: {error.digest}
+            </p>
+          )}
           <button
             onClick={reset}
             style={{

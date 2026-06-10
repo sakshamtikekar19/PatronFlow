@@ -23,14 +23,16 @@ export function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex flex-1 flex-col lg:ml-0">
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-0">
         <Navbar
           restaurantName={restaurantName}
           restaurantLogo={restaurantLogo}
           userEmail={userEmail}
           onMenuClick={() => setSidebarOpen(true)}
         />
-        <main className="flex-1 p-4 lg:p-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
+          {children}
+        </main>
         <footer className="border-t border-neutral-100 px-4 py-6 text-center lg:px-8">
           <p className="text-sm font-semibold italic text-neutral-700">
             {BRAND.name}
