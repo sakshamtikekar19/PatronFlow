@@ -21,7 +21,7 @@ export async function createTableQr(
     return { error: "Restaurant not found" };
   }
 
-  const qrUrl = buildReviewUrl(restaurant.id, trimmed);
+  const qrUrl = buildReviewUrl(restaurant.slug ?? restaurant.id, trimmed);
 
   const { data, error } = await supabase
     .from("table_qrs")

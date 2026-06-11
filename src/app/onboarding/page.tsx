@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <OnboardingWizard
         restaurant={restaurant}
-        reviewUrl={buildReviewUrl(restaurant.id)}
+        reviewUrl={buildReviewUrl(restaurant.slug ?? restaurant.id)}
       />
     </div>
   );

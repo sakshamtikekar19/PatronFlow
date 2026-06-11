@@ -34,6 +34,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/signup");
   const isPublicRoute =
+    pathname.startsWith("/review/") ||
     pathname.startsWith("/r/") ||
     pathname.startsWith("/api/feedback") ||
     // Public event pages and RSVP submissions (the admin /events page has no

@@ -1,61 +1,32 @@
-import Image from "next/image";
-import { ReviewForm } from "@/components/review/review-form";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { BRAND } from "@/config/branding";
-import { notFound } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
+import { getRestaurantBySlugOrId } from "@/lib/queries/restaurant";
 
-interface ReviewPageProps {
+interface LegacyReviewRedirectProps {
   params: Promise<{ restaurantId: string }>;
   searchParams: Promise<{ table?: string; source?: string }>;
 }
 
-export default async function ReviewPage({
+/**
+ * Legacy ID-based review URL (/r/[id]). Kept only so previously printed QR
+ * codes keep working — it 301-style redirects to the canonical, SEO-friendly
+ * slug URL (/review/[slug]).
+ */
+export default async function LegacyReviewRedirect({
   params,
   searchParams,
-}: ReviewPageProps) {
+}: LegacyReviewRedirectProps) {
   const { restaurantId } = await params;
   const { table, source } = await searchParams;
 
-  let restaurant;
-  try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("restaurants")
-      .select("id, name, logo")
-      .eq("id", restaurantId)
-      .single();
-
-    if (error || !data) {
-      notFound();
-    }
-    restaurant = data;
-  } catch {
+  const restaurant = await getRestaurantBySlugOrId(restaurantId);
+  if (!restaurant) {
     notFound();
   }
 
-  return (
-    <div className="min-h-screen bg-[#F5F2ED] flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-8">
-        <ReviewForm
-          restaurantId={restaurant.id}
-          restaurantName={restaurant.name}
-          restaurantLogo={restaurant.logo}
-          tableName={table}
-          source={source}
-        />
-      </div>
-      <div className="mt-6 flex flex-col items-center gap-1.5">
-        <span className="text-[11px] uppercase tracking-[0.08em] text-neutral-400">
-          Powered by
-        </span>
-        <Image
-          src="/patronflowlogo.png"
-          alt={BRAND.name}
-          width={1297}
-          height={375}
-          className="h-6 w-auto opacity-80"
-        />
-      </div>
-    </div>
-  );
+  const qs = new URLSearchParams();
+  if (table) qs.set("table", table);
+  if (source) qs.set("source", source);
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+
+  redirect(`/review/${restaurant.slug ?? restaurant.id}${suffix}`);
 }

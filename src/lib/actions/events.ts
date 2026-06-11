@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { generateUniqueEventSlug } from "@/lib/slug";
 import type { Event, EventStatus } from "@/types";
 
 interface EventInput {
@@ -23,11 +25,16 @@ export async function createEvent(
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
 
+  // Globally-unique, SEO-friendly slug for the public RSVP URL (/events/[slug]).
+  const admin = createAdminClient();
+  const slug = await generateUniqueEventSlug(admin, title);
+
   const { data, error } = await supabase
     .from("events")
     .insert({
       restaurant_id: restaurant.id,
       title,
+      slug,
       description: input.description?.trim() || null,
       event_date: input.eventDate || null,
       cover_image: input.coverImage?.trim() || null,
@@ -54,10 +61,26 @@ export async function updateEvent(
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
 
+  // Backfill a slug for legacy events that predate slugs; keep it stable
+  // afterwards so the public URL never changes.
+  const { data: existing } = await supabase
+    .from("events")
+    .select("slug")
+    .eq("id", id)
+    .eq("restaurant_id", restaurant.id)
+    .maybeSingle();
+
+  let slug = existing?.slug ?? undefined;
+  if (!slug) {
+    const admin = createAdminClient();
+    slug = await generateUniqueEventSlug(admin, title, id);
+  }
+
   const { error } = await supabase
     .from("events")
     .update({
       title,
+      slug,
       description: input.description?.trim() || null,
       event_date: input.eventDate || null,
       cover_image: input.coverImage?.trim() || null,

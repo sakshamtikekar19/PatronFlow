@@ -83,17 +83,33 @@ export async function getEventRsvps(
   return data ?? [];
 }
 
-/** Public, published-only event fetch (bypasses RLS via service role). */
-export async function getPublicEvent(eventId: string): Promise<
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Public, published-only event fetch (bypasses RLS via service role).
+ * Resolves by SEO-friendly slug, falling back to an id match for
+ * already-shared ID-based links.
+ */
+export async function getPublicEvent(slugOrId: string): Promise<
   | (Event & { restaurant: { id: string; name: string; logo: string | null } })
   | null
 > {
   const supabase = createAdminClient();
-  const { data } = await supabase
+
+  let { data } = await supabase
     .from("events")
     .select("*, restaurant:restaurants(id, name, logo)")
-    .eq("id", eventId)
+    .eq("slug", slugOrId)
     .maybeSingle();
+
+  if (!data && UUID_RE.test(slugOrId)) {
+    ({ data } = await supabase
+      .from("events")
+      .select("*, restaurant:restaurants(id, name, logo)")
+      .eq("id", slugOrId)
+      .maybeSingle());
+  }
 
   if (!data) return null;
   if (data.status === "draft") return null;

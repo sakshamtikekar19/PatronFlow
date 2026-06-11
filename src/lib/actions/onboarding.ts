@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { generateUniqueRestaurantSlug } from "@/lib/slug";
 
 export interface OnboardingData {
   name: string;
@@ -21,12 +23,28 @@ export async function saveOnboardingDetails(
 
   if (!user) return { error: "Not authenticated" };
 
-  if (!data.name.trim()) return { error: "Restaurant name is required" };
+  const name = data.name.trim();
+  if (!name) return { error: "Restaurant name is required" };
+
+  // Fetch the current row so we only mint a slug once (slugs are permanent so
+  // public review URLs never change, even if the name is edited later).
+  const { data: existing } = await supabase
+    .from("restaurants")
+    .select("id, slug")
+    .eq("owner_id", user.id)
+    .single();
+
+  let slug = existing?.slug ?? undefined;
+  if (!slug) {
+    const admin = createAdminClient();
+    slug = await generateUniqueRestaurantSlug(admin, name, existing?.id);
+  }
 
   const { error } = await supabase
     .from("restaurants")
     .update({
-      name: data.name.trim(),
+      name,
+      slug,
       cuisine_type: data.cuisineType?.trim() || null,
       google_review_url: data.googleReviewUrl?.trim() || null,
     })

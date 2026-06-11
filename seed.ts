@@ -64,6 +64,7 @@ if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
 const DEMO_EMAIL = "demo@patronflow.app";
 const DEMO_PASSWORD = "DemoPatron#2026";
 const DEMO_RESTAURANT_NAME = "PatronFlow Demo Bistro";
+const DEMO_RESTAURANT_SLUG = "patronflow-demo-bistro";
 
 // ---------------------------------------------------------------------------
 // Random data pools
@@ -254,6 +255,7 @@ async function getOrCreateDemoRestaurant(): Promise<string> {
     .from("restaurants")
     .update({
       name: DEMO_RESTAURANT_NAME,
+      slug: DEMO_RESTAURANT_SLUG,
       onboarded: true,
       cuisine_type: "Multi-cuisine",
       google_review_url: "https://g.page/r/patronflow-demo/review",
@@ -574,6 +576,7 @@ interface SeedEvent {
   id: string;
   restaurant_id: string;
   title: string;
+  slug: string;
   description: string;
   event_date: string;
   cover_image: null;
@@ -581,9 +584,21 @@ interface SeedEvent {
   created_at: string;
 }
 
+function seedSlugify(input: string): string {
+  return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function buildEvents(restaurantId: string): SeedEvent[] {
   const events: SeedEvent[] = [];
   const titles = shuffleCopy(EVENT_TITLES);
+  const usedSlugs = new Set<string>();
 
   // 5 completed (past), 4 published (upcoming), 1 draft (upcoming).
   const specs: { status: SeedEvent["status"]; date: () => string }[] = [
@@ -605,10 +620,15 @@ function buildEvents(restaurantId: string): SeedEvent[] {
       spec.status === "completed"
         ? new Date(new Date(eventDate).getTime() - rand(10, 30) * DAY_MS).toISOString()
         : isoDaysAgo(40, 0);
+    const title = titles[i] ?? `Special Event ${i + 1}`;
+    let slug = seedSlugify(title) || `event-${i + 1}`;
+    if (usedSlugs.has(slug)) slug = `${slug}-${i + 1}`;
+    usedSlugs.add(slug);
     events.push({
       id: randomUUID(),
       restaurant_id: restaurantId,
-      title: titles[i] ?? `Special Event ${i + 1}`,
+      title,
+      slug,
       description:
         "Join us for a memorable evening of great food, drinks, and company. Limited seats — RSVP to reserve your spot!",
       event_date: eventDate,

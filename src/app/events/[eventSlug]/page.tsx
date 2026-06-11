@@ -5,15 +5,15 @@ import { getPublicEvent } from "@/lib/queries/events";
 import { BRAND } from "@/config/branding";
 
 interface PublicEventPageProps {
-  params: Promise<{ eventId: string }>;
+  params: Promise<{ eventSlug: string }>;
 }
 
 export default async function PublicEventPage({
   params,
 }: PublicEventPageProps) {
-  const { eventId } = await params;
+  const { eventSlug } = await params;
 
-  const event = await getPublicEvent(eventId);
+  const event = await getPublicEvent(eventSlug);
   if (!event) {
     notFound();
   }

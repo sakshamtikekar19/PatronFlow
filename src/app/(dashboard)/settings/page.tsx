@@ -26,7 +26,7 @@ export default async function SettingsPage() {
       </div>
       <SettingsTabs
         restaurant={restaurant}
-        reviewUrl={buildReviewUrl(restaurant.id)}
+        reviewUrl={buildReviewUrl(restaurant.slug ?? restaurant.id)}
         userEmail={user?.email}
       />
     </div>

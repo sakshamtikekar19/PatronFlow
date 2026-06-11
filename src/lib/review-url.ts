@@ -5,17 +5,21 @@ function getBaseUrl(): string {
   );
 }
 
-/** Build the public review URL for a restaurant, optionally scoped to a table. */
+/**
+ * Build the public review URL for a restaurant, optionally scoped to a table.
+ * Uses the SEO-friendly slug (e.g. /review/the-blue-door). Falls back to the
+ * id only if a slug is somehow missing, so links never break.
+ */
 export function buildReviewUrl(
-  restaurantId: string,
+  slugOrId: string,
   tableName?: string
 ): string {
-  const base = `${getBaseUrl()}/r/${restaurantId}`;
+  const base = `${getBaseUrl()}/review/${slugOrId}`;
   if (!tableName) return base;
   return `${base}?table=${encodeURIComponent(tableName)}`;
 }
 
 /** Build the public RSVP page URL for an event (QR destination). */
-export function buildEventUrl(eventId: string): string {
-  return `${getBaseUrl()}/events/${eventId}`;
+export function buildEventUrl(slugOrId: string): string {
+  return `${getBaseUrl()}/events/${slugOrId}`;
 }

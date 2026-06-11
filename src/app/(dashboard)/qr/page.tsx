@@ -18,7 +18,7 @@ export default async function QrPage() {
     getTableAnalytics(restaurant.id),
   ]);
 
-  const mainUrl = buildReviewUrl(restaurant.id);
+  const mainUrl = buildReviewUrl(restaurant.slug ?? restaurant.id);
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">

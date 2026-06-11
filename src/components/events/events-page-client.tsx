@@ -593,7 +593,7 @@ export function EventsPageClient({
           </DialogHeader>
           {qrEvent && (
             <QrCodeCard
-              url={buildEventUrl(qrEvent.id)}
+              url={buildEventUrl(qrEvent.slug ?? qrEvent.id)}
               title={qrEvent.title}
               subtitle="Scan to RSVP"
               filename={`event-${qrEvent.title}`}

@@ -16,6 +16,7 @@ export interface Restaurant {
   id: string;
   owner_id: string;
   name: string;
+  slug: string | null;
   logo: string | null;
   google_review_url: string | null;
   cuisine_type: string | null;
@@ -90,6 +91,7 @@ export interface Event {
   id: string;
   restaurant_id: string;
   title: string;
+  slug: string | null;
   description: string | null;
   event_date: string | null;
   cover_image: string | null;
@@ -116,6 +118,7 @@ export interface Database {
           id?: string;
           owner_id: string;
           name: string;
+          slug?: string | null;
           logo?: string | null;
           google_review_url?: string | null;
           cuisine_type?: string | null;
@@ -124,6 +127,7 @@ export interface Database {
         };
         Update: {
           name?: string;
+          slug?: string | null;
           logo?: string | null;
           google_review_url?: string | null;
           cuisine_type?: string | null;
@@ -285,6 +289,7 @@ export interface Database {
           id?: string;
           restaurant_id: string;
           title: string;
+          slug?: string | null;
           description?: string | null;
           event_date?: string | null;
           cover_image?: string | null;
@@ -293,6 +298,7 @@ export interface Database {
         };
         Update: {
           title?: string;
+          slug?: string | null;
           description?: string | null;
           event_date?: string | null;
           cover_image?: string | null;
