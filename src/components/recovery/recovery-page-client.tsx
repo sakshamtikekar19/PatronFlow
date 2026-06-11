@@ -152,13 +152,13 @@ export function RecoveryPageClient({
                         {c.category}
                       </span>
                     </TableCell>
-                    <TableCell className="hidden xl:table-cell max-w-[220px]">
+                    <TableCell className="hidden xl:table-cell">
                       {c.comment ? (
                         <button
                           type="button"
                           onClick={() => setCommentCase(c)}
                           title="Click to read full comment"
-                          className="line-clamp-2 text-left text-neutral-600 hover:text-neutral-900 hover:underline"
+                          className="block max-w-[240px] line-clamp-2 break-words text-left text-neutral-600 hover:text-neutral-900 hover:underline"
                         >
                           {c.comment}
                         </button>
@@ -166,7 +166,7 @@ export function RecoveryPageClient({
                         <span className="text-neutral-600">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell text-neutral-500">
+                    <TableCell className="hidden sm:table-cell whitespace-nowrap text-neutral-500">
                       {formatDate(c.created_at)}
                     </TableCell>
                     <TableCell>
