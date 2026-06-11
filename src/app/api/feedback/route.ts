@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const feedbackSchema = z.object({
   restaurantId: z.string().uuid(),
-  name: z.string().min(1, "Name is required"),
+  name: z.string().trim().min(1, "Name is required").optional(),
   phone: z.string().min(1, "Phone is required"),
   birthday: z
     .string()
@@ -53,20 +53,49 @@ export async function POST(request: Request) {
 
     const { data: existingCustomer } = await supabase
       .from("customers")
-      .select("id")
+      .select("id, name")
       .eq("restaurant_id", restaurantId)
       .eq("phone", phone)
       .maybeSingle();
 
     let customerId: string;
+    let hasPriorPositive = false;
 
     if (existingCustomer) {
       customerId = existingCustomer.id;
-      await supabase
-        .from("customers")
-        .update({ name, ...(birthday ? { birthday } : {}) })
-        .eq("id", customerId);
+
+      // Has this guest already left a positive (4-5★) review before? Google
+      // only allows one review per guest, so we ask once and nudge loyalty
+      // on later visits.
+      const { count } = await supabase
+        .from("feedback")
+        .select("id", { count: "exact", head: true })
+        .eq("restaurant_id", restaurantId)
+        .eq("customer_id", customerId)
+        .gte("rating", 4);
+      hasPriorPositive = (count ?? 0) > 0;
+
+      const updates: { name?: string; birthday?: string } = {};
+      if (name) updates.name = name;
+      if (birthday) updates.birthday = birthday;
+
+      if (Object.keys(updates).length > 0) {
+        await supabase
+          .from("customers")
+          .update(updates)
+          .eq("id", customerId);
+      }
     } else {
+      if (!name || !birthday) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Name and birthday are required for first-time guests",
+          },
+          { status: 400 }
+        );
+      }
+
       const { data: newCustomer, error: customerError } = await supabase
         .from("customers")
         .insert({
@@ -88,7 +117,12 @@ export async function POST(request: Request) {
       customerId = newCustomer.id;
     }
 
-    const showGoogleReview = rating >= 4;
+    const isPositive = rating >= 4;
+    // Ask for a Google review only the FIRST time a guest is happy (Google
+    // caps reviews at one per guest). Returning happy guests get a loyalty nudge.
+    const showGoogleReview =
+      isPositive && !hasPriorPositive && !!restaurant.google_review_url;
+    const showLoyaltyNudge = isPositive && !showGoogleReview;
 
     const { data: feedbackRow, error: feedbackError } = await supabase
       .from("feedback")
@@ -121,14 +155,41 @@ export async function POST(request: Request) {
       source: source ?? (tableName ? "table-qr" : "direct"),
     });
 
+    // Pull the most accessible reward to make the loyalty nudge enticing.
+    let loyaltyReward: { name: string; points: number } | null = null;
+    if (showLoyaltyNudge) {
+      const { data: reward } = await supabase
+        .from("loyalty_rules")
+        .select("reward_name, points_required")
+        .eq("restaurant_id", restaurantId)
+        .order("points_required", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (reward) {
+        loyaltyReward = {
+          name: reward.reward_name,
+          points: reward.points_required,
+        };
+      }
+    }
+
+    let message: string;
+    if (!isPositive) {
+      message = "Thank you for helping us improve.";
+    } else if (showGoogleReview) {
+      message = "Thank you for your feedback!";
+    } else {
+      message = "Thanks for coming back!";
+    }
+
     const response: PublicFeedbackResponse = {
       success: true,
       showGoogleReview,
       googleReviewUrl: showGoogleReview ? restaurant.google_review_url : null,
-      message: showGoogleReview
-        ? "Thank you for your feedback!"
-        : "Thank you for helping us improve.",
+      message,
       feedbackId: feedbackRow.id,
+      showLoyaltyNudge,
+      loyaltyReward,
     };
 
     return NextResponse.json(response);

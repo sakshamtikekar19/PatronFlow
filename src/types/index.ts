@@ -126,6 +126,8 @@ export interface PublicFeedbackResponse {
   googleReviewUrl?: string | null;
   message: string;
   feedbackId?: string;
+  showLoyaltyNudge?: boolean;
+  loyaltyReward?: { name: string; points: number } | null;
 }
 
 export const CUISINE_TYPES = [
