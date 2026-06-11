@@ -101,13 +101,17 @@ export async function deleteEvent(
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("events")
     .delete()
     .eq("id", id)
-    .eq("restaurant_id", restaurant.id);
+    .eq("restaurant_id", restaurant.id)
+    .select("id");
 
   if (error) return { error: error.message };
+  if (!data || data.length === 0) {
+    return { error: "Could not delete this event — it no longer exists." };
+  }
 
   revalidatePath("/events");
   revalidatePath("/dashboard");

@@ -48,11 +48,21 @@ export async function deleteTableQr(
   id: string
 ): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
+  const restaurant = await getRestaurantForUser();
+  if (!restaurant) return { error: "Restaurant not found" };
 
-  const { error } = await supabase.from("table_qrs").delete().eq("id", id);
+  const { data, error } = await supabase
+    .from("table_qrs")
+    .delete()
+    .eq("id", id)
+    .eq("restaurant_id", restaurant.id)
+    .select("id");
 
   if (error) {
     return { error: error.message };
+  }
+  if (!data || data.length === 0) {
+    return { error: "Could not delete this QR — it no longer exists." };
   }
 
   revalidatePath("/qr");

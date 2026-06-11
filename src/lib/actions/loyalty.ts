@@ -41,8 +41,21 @@ export async function deleteLoyaltyRule(
   id: string
 ): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
-  const { error } = await supabase.from("loyalty_rules").delete().eq("id", id);
+  const restaurant = await getRestaurantForUser();
+  if (!restaurant) return { error: "Restaurant not found" };
+
+  const { data, error } = await supabase
+    .from("loyalty_rules")
+    .delete()
+    .eq("id", id)
+    .eq("restaurant_id", restaurant.id)
+    .select("id");
+
   if (error) return { error: error.message };
+  if (!data || data.length === 0) {
+    return { error: "Could not delete this reward — it no longer exists." };
+  }
+
   revalidatePath("/loyalty");
   return { success: true };
 }
