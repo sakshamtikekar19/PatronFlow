@@ -27,6 +27,7 @@ import { EmptyState } from "@/components/empty-state";
 import { QrCodeCard } from "@/components/qr/qr-code-card";
 import { EventGrowthChart } from "@/components/charts/event-growth-chart";
 import { buildEventUrl } from "@/lib/review-url";
+import { createClient } from "@/lib/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,6 @@ import {
   deleteEvent,
   setEventStatus,
   toggleRsvpAttendance,
-  uploadEventCover,
 } from "@/lib/actions/events";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -118,24 +118,51 @@ export function EventsPageClient({
     e.target.value = ""; // allow re-selecting the same file
     if (!file) return;
 
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Image must be a PNG, JPG, or WEBP");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be smaller than 5MB");
+      return;
+    }
+
     setIsUploadingCover(true);
     try {
-      const formData = new FormData();
-      formData.append("cover", file);
-      const res = await uploadEventCover(formData);
-      if (res.error) {
-        toast.error(res.error);
+      // Upload straight to Supabase Storage from the browser. This avoids the
+      // Server Action request-body size limit that rejected larger images.
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Your session expired. Please sign in again.");
         return;
       }
-      if (res.coverUrl) {
-        setCoverImage(res.coverUrl);
-        toast.success("Image uploaded");
-      } else {
-        toast.error("Upload did not return an image. Please try again.");
+
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `events/${user.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("logos")
+        .upload(path, file, { contentType: file.type, upsert: true });
+      if (uploadError) {
+        toast.error(`Upload failed: ${uploadError.message}`);
+        return;
       }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("logos").getPublicUrl(path);
+
+      setCoverImage(publicUrl);
+      toast.success("Image uploaded");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Image upload failed. Please try again."
+        err instanceof Error
+          ? err.message
+          : "Image upload failed. Please try again."
       );
     } finally {
       setIsUploadingCover(false);
