@@ -59,7 +59,7 @@ export function ExportButton({ endpoint, label = "Export CSV" }: ExportButtonPro
           <Button
             type="button"
             variant="outline"
-            className="rounded-xl border-neutral-200"
+            className="rounded-xl border-border"
           />
         }
       >
@@ -71,7 +71,7 @@ export function ExportButton({ endpoint, label = "Export CSV" }: ExportButtonPro
           <DialogTitle>Export CSV</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Optionally filter by date range. Leave blank to export everything.
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -82,7 +82,7 @@ export function ExportButton({ endpoint, label = "Export CSV" }: ExportButtonPro
                 type="date"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
-                className="h-10 rounded-xl border-neutral-200"
+                className="h-10 rounded-xl border-border"
               />
             </div>
             <div className="space-y-1.5">
@@ -92,7 +92,7 @@ export function ExportButton({ endpoint, label = "Export CSV" }: ExportButtonPro
                 type="date"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                className="h-10 rounded-xl border-neutral-200"
+                className="h-10 rounded-xl border-border"
               />
             </div>
           </div>

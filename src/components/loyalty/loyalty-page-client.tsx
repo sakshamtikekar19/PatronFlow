@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FieldLabel } from "@/components/form-label";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -196,7 +197,7 @@ export function LoyaltyPageClient({
       </div>
 
       {/* View switcher */}
-      <div className="inline-flex gap-1 rounded-xl bg-neutral-100 p-1">
+      <div className="inline-flex gap-1 rounded-xl bg-muted p-1">
         {(
           [
             { id: "members", label: "Members", icon: Users },
@@ -210,8 +211,8 @@ export function LoyaltyPageClient({
             className={cn(
               "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
               view === id
-                ? "bg-white text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                : "text-neutral-500 hover:text-neutral-900"
+                ? "bg-card text-foreground shadow-card"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Icon className="h-4 w-4" />
@@ -224,7 +225,7 @@ export function LoyaltyPageClient({
       {view === "points" && (
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-neutral-900">Rewards</h2>
+          <h2 className="text-lg font-semibold text-foreground">Rewards</h2>
           <Button onClick={() => setRewardOpen(true)}>
             <Plus className="h-4 w-4" />
             Create reward
@@ -248,7 +249,7 @@ export function LoyaltyPageClient({
             {rules.map((rule) => (
               <Card
                 key={rule.id}
-                className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl"
+                className="border-0 bg-card shadow-card rounded-2xl"
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-2">
@@ -257,10 +258,10 @@ export function LoyaltyPageClient({
                         <Gift className="h-4 w-4" />
                       </span>
                       <div>
-                        <p className="font-medium text-neutral-900">
+                        <p className="font-medium text-foreground">
                           {rule.reward_name}
                         </p>
-                        <p className="text-xs text-neutral-500">
+                        <p className="text-xs text-muted-foreground">
                           {rule.points_required} points
                         </p>
                       </div>
@@ -268,14 +269,15 @@ export function LoyaltyPageClient({
                     <Button
                       variant="ghost"
                       size="icon-sm"
+                      aria-label={`Delete ${rule.reward_name}`}
                       onClick={() => removeReward(rule.id)}
                       disabled={isPending}
                     >
-                      <Trash2 className="h-4 w-4 text-neutral-400" />
+                      <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
                   {rule.reward_description && (
-                    <p className="mt-3 text-sm text-neutral-600">
+                    <p className="mt-3 text-sm text-muted-foreground">
                       {rule.reward_description}
                     </p>
                   )}
@@ -291,10 +293,10 @@ export function LoyaltyPageClient({
       {view === "members" && (
       <div>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold text-neutral-900">Members</h2>
+          <h2 className="text-lg font-semibold text-foreground">Members</h2>
           {customers.length > 0 && (
             <div className="relative w-full sm:w-72">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -317,71 +319,118 @@ export function LoyaltyPageClient({
             description={`No members match "${search}". Try a different name or phone number.`}
           />
         ) : (
-          <Card className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Customer</TableHead>
-                    <TableHead className="text-right">Balance</TableHead>
-                    <TableHead className="hidden sm:table-cell text-right">
-                      Earned
-                    </TableHead>
-                    <TableHead className="hidden sm:table-cell text-right">
-                      Redeemed
-                    </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCustomers.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell>
-                        <div className="font-medium text-neutral-900">
-                          {c.name}
-                        </div>
-                        <div className="text-xs text-neutral-500">{c.phone}</div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge
-                          variant="secondary"
-                          className="border-0 bg-neutral-100 text-neutral-800"
-                        >
-                          <Coins className="h-3 w-3" />
-                          {c.totalPoints}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-right text-neutral-600">
-                        {c.pointsEarned}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-right text-neutral-600">
-                        {c.pointsRedeemed}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openPoints(c, "earned")}
-                          >
-                            Add
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={c.totalPoints <= 0}
-                            onClick={() => openPoints(c, "redeemed")}
-                          >
-                            Redeem
-                          </Button>
-                        </div>
-                      </TableCell>
+          <>
+            <Card className="hidden rounded-2xl border-0 bg-card shadow-card md:block">
+              <CardContent className="overflow-x-auto p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Customer</TableHead>
+                      <TableHead className="text-right">Balance</TableHead>
+                      <TableHead className="hidden sm:table-cell text-right">
+                        Earned
+                      </TableHead>
+                      <TableHead className="hidden sm:table-cell text-right">
+                        Redeemed
+                      </TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCustomers.map((c) => (
+                      <TableRow key={c.id}>
+                        <TableCell>
+                          <div className="font-medium text-foreground">
+                            {c.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{c.phone}</div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge
+                            variant="secondary"
+                            className="border-0 bg-muted text-foreground"
+                          >
+                            <Coins className="h-3 w-3" />
+                            {c.totalPoints}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell text-right text-muted-foreground">
+                          {c.pointsEarned}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell text-right text-muted-foreground">
+                          {c.pointsRedeemed}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openPoints(c, "earned")}
+                            >
+                              Add
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={c.totalPoints <= 0}
+                              onClick={() => openPoints(c, "redeemed")}
+                            >
+                              Redeem
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+            <div className="space-y-3 md:hidden">
+              {filteredCustomers.map((c) => (
+                <Card
+                  key={c.id}
+                  className="rounded-2xl border-0 bg-card shadow-card"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{c.name}</p>
+                        <p className="text-xs text-muted-foreground">{c.phone}</p>
+                      </div>
+                      <Badge
+                        variant="secondary"
+                        className="shrink-0 border-0 bg-muted text-foreground"
+                      >
+                        <Coins className="h-3 w-3" />
+                        {c.totalPoints}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
+                      <span>Earned {c.pointsEarned}</span>
+                      <span>Redeemed {c.pointsRedeemed}</span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openPoints(c, "earned")}
+                      >
+                        Add
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={c.totalPoints <= 0}
+                        onClick={() => openPoints(c, "redeemed")}
+                      >
+                        Redeem
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
         )}
       </div>
       )}
@@ -390,7 +439,7 @@ export function LoyaltyPageClient({
       {view === "points" && (
       <div>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold text-neutral-900">
+          <h2 className="text-lg font-semibold text-foreground">
             Points history
           </h2>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -409,7 +458,7 @@ export function LoyaltyPageClient({
               </SelectContent>
             </Select>
             <div className="relative w-full sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={historySearch}
                 onChange={(e) => setHistorySearch(e.target.value)}
@@ -433,33 +482,34 @@ export function LoyaltyPageClient({
             description="Try a different filter, name, or phone number."
           />
         ) : (
-          <Card className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="hidden sm:table-cell">Notes</TableHead>
-                    <TableHead className="text-right">Points</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTransactions.map((t) => {
+          <>
+            <Card className="hidden rounded-2xl border-0 bg-card shadow-card md:block">
+              <CardContent className="overflow-x-auto p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Date</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead className="hidden sm:table-cell">Notes</TableHead>
+                      <TableHead className="text-right">Points</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTransactions.map((t) => {
                     const isRedeemed = t.transaction_type === "redeemed";
                     const isEarned = t.transaction_type === "earned";
                     return (
                       <TableRow key={t.id}>
-                        <TableCell className="whitespace-nowrap text-sm text-neutral-600">
+                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                           {TXN_DATE_FMT.format(new Date(t.created_at))}
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-neutral-900">
+                          <div className="font-medium text-foreground">
                             {t.customerName}
                           </div>
                           {t.customerPhone && (
-                            <div className="text-xs text-neutral-500">
+                            <div className="text-xs text-muted-foreground">
                               {t.customerPhone}
                             </div>
                           )}
@@ -472,7 +522,7 @@ export function LoyaltyPageClient({
                                 ? "border-0 bg-rose-50 text-rose-700"
                                 : isEarned
                                 ? "border-0 bg-emerald-50 text-emerald-700"
-                                : "border-0 bg-neutral-100 text-neutral-700"
+                                : "border-0 bg-muted text-foreground"
                             }
                           >
                             {isRedeemed ? (
@@ -487,7 +537,7 @@ export function LoyaltyPageClient({
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell text-sm text-neutral-600">
+                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                           {t.notes ?? "—"}
                         </TableCell>
                         <TableCell
@@ -505,6 +555,64 @@ export function LoyaltyPageClient({
               </Table>
             </CardContent>
           </Card>
+            <div className="space-y-3 md:hidden">
+              {filteredTransactions.map((t) => {
+                const isRedeemed = t.transaction_type === "redeemed";
+                const isEarned = t.transaction_type === "earned";
+                return (
+                  <Card
+                    key={t.id}
+                    className="rounded-2xl border-0 bg-card shadow-card"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-medium text-foreground">
+                            {t.customerName}
+                          </p>
+                          {t.customerPhone && (
+                            <p className="text-xs text-muted-foreground">
+                              {t.customerPhone}
+                            </p>
+                          )}
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {TXN_DATE_FMT.format(new Date(t.created_at))}
+                          </p>
+                        </div>
+                        <span
+                          className={`shrink-0 text-sm font-semibold ${
+                            isRedeemed ? "text-rose-600" : "text-emerald-600"
+                          }`}
+                        >
+                          {isRedeemed ? "−" : "+"}
+                          {t.points}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <Badge
+                          variant="secondary"
+                          className={
+                            isRedeemed
+                              ? "border-0 bg-rose-50 text-rose-700"
+                              : isEarned
+                              ? "border-0 bg-emerald-50 text-emerald-700"
+                              : "border-0 bg-muted text-foreground"
+                          }
+                        >
+                          <span className="capitalize">{t.transaction_type}</span>
+                        </Badge>
+                        {t.notes && (
+                          <span className="text-xs text-muted-foreground">
+                            {t.notes}
+                          </span>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
       )}
@@ -520,7 +628,9 @@ export function LoyaltyPageClient({
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="reward-name">Reward name</Label>
+              <FieldLabel htmlFor="reward-name" required>
+                Reward name
+              </FieldLabel>
               <Input
                 id="reward-name"
                 value={rewardName}
@@ -529,7 +639,9 @@ export function LoyaltyPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="reward-points">Points required</Label>
+              <FieldLabel htmlFor="reward-points" required>
+                Points required
+              </FieldLabel>
               <Input
                 id="reward-points"
                 type="number"
@@ -540,7 +652,9 @@ export function LoyaltyPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="reward-desc">Description (optional)</Label>
+              <FieldLabel htmlFor="reward-desc" optional>
+                Description
+              </FieldLabel>
               <Textarea
                 id="reward-desc"
                 value={rewardDesc}
@@ -596,7 +710,9 @@ export function LoyaltyPageClient({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="points-amount">Points</Label>
+              <FieldLabel htmlFor="points-amount" required>
+                Points
+              </FieldLabel>
               <Input
                 id="points-amount"
                 type="number"
@@ -607,7 +723,9 @@ export function LoyaltyPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="points-notes">Notes (optional)</Label>
+              <FieldLabel htmlFor="points-notes" optional>
+                Notes
+              </FieldLabel>
               <Input
                 id="points-notes"
                 value={pointsNotes}

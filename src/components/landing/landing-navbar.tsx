@@ -27,7 +27,7 @@ export function LandingNavbar() {
         className={cn(
           "mx-auto flex h-16 max-w-7xl items-center justify-between px-4 transition-all duration-300 sm:px-6",
           scrolled
-            ? "mt-2 rounded-2xl border border-white/40 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl sm:mt-3 lg:max-w-6xl dark:border-white/10 dark:bg-neutral-900/70"
+            ? "mt-2 rounded-2xl border border-white/40 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl sm:mt-3 lg:max-w-6xl"
             : "border border-transparent bg-transparent"
         )}
       >
@@ -75,7 +75,7 @@ export function LandingNavbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="mx-4 mt-2 rounded-2xl border border-white/40 bg-white/90 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.1)] backdrop-blur-xl md:hidden dark:border-white/10 dark:bg-neutral-900/90"
+            className="mx-4 mt-2 rounded-2xl border border-white/40 bg-white/90 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.1)] backdrop-blur-xl md:hidden"
           >
             <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (

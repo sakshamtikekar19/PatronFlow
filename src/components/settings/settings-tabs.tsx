@@ -171,8 +171,8 @@ export function SettingsTabs({
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
               tab === id
-                ? "bg-white text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                : "text-neutral-500 hover:text-neutral-900",
+                ? "bg-card text-foreground shadow-card"
+                : "text-muted-foreground hover:text-foreground",
               id === "danger" && tab === id && "text-red-600"
             )}
           >
@@ -186,13 +186,13 @@ export function SettingsTabs({
         {/* Restaurant */}
         {tab === "restaurant" && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-5 rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="space-y-5 rounded-2xl bg-card p-6 shadow-card">
               <div className="space-y-2">
                 <Label htmlFor="name">Restaurant Name</Label>
                 <Input
                   id="name"
                   {...register("name")}
-                  className="h-11 rounded-xl border-neutral-200"
+                  className="h-11 rounded-xl border-border"
                 />
                 {errors.name && (
                   <p className="text-sm text-red-600">{errors.name.message}</p>
@@ -207,7 +207,7 @@ export function SettingsTabs({
                 >
                   <SelectTrigger
                     id="cuisine"
-                    className="h-11 rounded-xl border-neutral-200"
+                    className="h-11 rounded-xl border-border"
                   >
                     <SelectValue placeholder="Select cuisine" />
                   </SelectTrigger>
@@ -227,14 +227,14 @@ export function SettingsTabs({
                   id="google_review_url"
                   {...register("google_review_url")}
                   placeholder="https://g.page/r/your-restaurant/review"
-                  className="h-11 rounded-xl border-neutral-200"
+                  className="h-11 rounded-xl border-border"
                 />
                 {errors.google_review_url && (
                   <p className="text-sm text-red-600">
                     {errors.google_review_url.message}
                   </p>
                 )}
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted-foreground">
                   Customers with 4+ star ratings will be redirected here.
                 </p>
               </div>
@@ -252,17 +252,17 @@ export function SettingsTabs({
 
         {/* Brand */}
         {tab === "brand" && (
-          <div className="space-y-4 rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="space-y-4 rounded-2xl bg-card p-6 shadow-card">
             <div>
-              <h3 className="text-sm font-semibold text-neutral-900">
+              <h3 className="text-sm font-semibold text-foreground">
                 Restaurant Logo
               </h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Appears in your dashboard and on your review page.
               </p>
             </div>
             <div className="flex items-center gap-5">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted">
                 {logoUrl ? (
                   <Image
                     src={logoUrl}
@@ -273,7 +273,7 @@ export function SettingsTabs({
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <ImageIcon className="h-7 w-7 text-neutral-300" />
+                  <ImageIcon className="h-7 w-7 text-muted-foreground/50" />
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -289,7 +289,7 @@ export function SettingsTabs({
                   variant="outline"
                   disabled={isUploading}
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-xl border-neutral-200"
+                  className="rounded-xl border-border"
                 >
                   <Upload className="mr-2 h-4 w-4" />
                   {isUploading
@@ -310,7 +310,7 @@ export function SettingsTabs({
                     Remove
                   </Button>
                 )}
-                <p className="w-full text-xs text-neutral-400">
+                <p className="w-full text-xs text-muted-foreground">
                   PNG, JPG, WEBP or SVG. Max 2MB.
                 </p>
               </div>
@@ -320,16 +320,16 @@ export function SettingsTabs({
 
         {/* QR */}
         {tab === "qr" && (
-          <div className="space-y-4 rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="space-y-4 rounded-2xl bg-card p-6 shadow-card">
             <div>
-              <h3 className="text-sm font-semibold text-neutral-900">
+              <h3 className="text-sm font-semibold text-foreground">
                 Your Review Link
               </h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Share this link or its QR code with customers.
               </p>
             </div>
-            <code className="block break-all rounded-xl bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
+            <code className="block break-all rounded-xl bg-muted px-4 py-3 text-sm text-foreground">
               {reviewUrl}
             </code>
             <div className="flex flex-wrap gap-3">
@@ -343,7 +343,7 @@ export function SettingsTabs({
                     restaurantLogo: logoUrl,
                   })
                 }
-                className="rounded-xl border-neutral-200"
+                className="rounded-xl border-border"
               >
                 <Printer className="mr-2 h-4 w-4" />
                 Print QR Poster
@@ -358,7 +358,7 @@ export function SettingsTabs({
                     restaurantLogo: logoUrl,
                   })
                 }
-                className="rounded-xl border-neutral-200"
+                className="rounded-xl border-border"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download Poster
@@ -376,10 +376,10 @@ export function SettingsTabs({
 
         {/* Account */}
         {tab === "account" && (
-          <div className="space-y-4 rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="space-y-4 rounded-2xl bg-card p-6 shadow-card">
             <div>
-              <h3 className="text-sm font-semibold text-neutral-900">Account</h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <h3 className="text-sm font-semibold text-foreground">Account</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Your login details.
               </p>
             </div>
@@ -389,7 +389,7 @@ export function SettingsTabs({
                 value={userEmail ?? ""}
                 readOnly
                 disabled
-                className="h-11 rounded-xl border-neutral-200 bg-neutral-50"
+                className="h-11 rounded-xl border-border bg-muted"
               />
             </div>
             <div className="space-y-2">
@@ -402,7 +402,7 @@ export function SettingsTabs({
               <Button
                 type="submit"
                 variant="outline"
-                className="rounded-xl border-neutral-200"
+                className="rounded-xl border-border"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
@@ -413,12 +413,12 @@ export function SettingsTabs({
 
         {/* Danger Zone */}
         {tab === "danger" && (
-          <div className="space-y-4 rounded-2xl border border-red-100 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="space-y-4 rounded-2xl border border-red-100 bg-card p-6 shadow-card">
             <div>
               <h3 className="text-sm font-semibold text-red-600">
                 Delete Account
               </h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Permanently delete your account, restaurant, customers, and all
                 feedback. This cannot be undone.
               </p>
@@ -477,15 +477,15 @@ function DeleteAccountDialog() {
           <DialogTitle>Delete account?</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-neutral-500">
-            Type <span className="font-semibold text-neutral-900">DELETE</span> to
+          <p className="text-sm text-muted-foreground">
+            Type <span className="font-semibold text-foreground">DELETE</span> to
             confirm. This permanently removes all your data.
           </p>
           <Input
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="DELETE"
-            className="h-11 rounded-xl border-neutral-200"
+            className="h-11 rounded-xl border-border"
           />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button

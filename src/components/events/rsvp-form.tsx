@@ -5,7 +5,7 @@ import Image from "next/image";
 import { CalendarDays, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FieldError, FieldLabel } from "@/components/form-label";
 import { formatDateTime } from "@/lib/utils";
 
 interface RsvpFormProps {
@@ -70,8 +70,8 @@ export function RsvpForm({
           <span className="text-3xl">🎉</span>
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-neutral-900">{success}</h2>
-          <p className="text-sm text-neutral-500">
+          <h2 className="text-xl font-semibold text-foreground">{success}</h2>
+          <p className="text-sm text-muted-foreground">
             We&apos;ve saved your spot for {title}.
           </p>
         </div>
@@ -104,35 +104,37 @@ export function RsvpForm({
             className="mx-auto h-14 w-14 rounded-full object-cover"
           />
         ) : (
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-xl font-semibold text-neutral-700">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted text-xl font-semibold text-foreground">
             {restaurantName.charAt(0)}
           </div>
         )}
         <div>
-          <p className="text-sm text-neutral-500">{restaurantName}</p>
-          <h1 className="text-2xl font-semibold text-neutral-900">{title}</h1>
+          <p className="text-sm text-muted-foreground">{restaurantName}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
         </div>
         {eventDate && (
-          <p className="flex items-center justify-center gap-1.5 text-sm text-neutral-600">
+          <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
             <CalendarDays className="h-4 w-4" />
             {formatDateTime(eventDate)}
           </p>
         )}
-        <p className="flex items-center justify-center gap-1.5 text-sm text-neutral-500">
+        <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" />
           {restaurantName}
         </p>
       </div>
 
       {description && (
-        <p className="rounded-2xl bg-neutral-50 p-4 text-sm leading-relaxed text-neutral-700">
+        <p className="rounded-2xl bg-muted p-4 text-sm leading-relaxed text-foreground">
           {description}
         </p>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="rsvp-name">Name</Label>
+          <FieldLabel htmlFor="rsvp-name" required>
+            Name
+          </FieldLabel>
           <Input
             id="rsvp-name"
             value={name}
@@ -141,7 +143,9 @@ export function RsvpForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="rsvp-phone">Phone</Label>
+          <FieldLabel htmlFor="rsvp-phone" required>
+            Phone
+          </FieldLabel>
           <Input
             id="rsvp-phone"
             value={phone}
@@ -150,7 +154,9 @@ export function RsvpForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="rsvp-email">Email (optional)</Label>
+          <FieldLabel htmlFor="rsvp-email" optional>
+            Email
+          </FieldLabel>
           <Input
             id="rsvp-email"
             type="email"
@@ -160,7 +166,7 @@ export function RsvpForm({
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        <FieldError message={error} />
 
         <Button
           type="submit"

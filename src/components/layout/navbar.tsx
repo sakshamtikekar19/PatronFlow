@@ -30,17 +30,18 @@ export function Navbar({
     : "DF";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-neutral-100 bg-background/80 px-4 backdrop-blur-sm lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-sm lg:px-8">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={onMenuClick}
           className="lg:hidden"
+          aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <span className="text-sm font-medium text-neutral-500 lg:hidden">
+        <span className="text-sm font-medium text-muted-foreground lg:hidden">
           {restaurantName}
         </span>
       </div>
@@ -48,8 +49,11 @@ export function Navbar({
       <div className="flex items-center gap-2">
         <NotificationBell />
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 rounded-full px-2 py-1.5 hover:bg-neutral-100 outline-none">
-            <span className="hidden text-sm text-neutral-600 sm:inline">
+          <DropdownMenuTrigger
+            className="flex items-center gap-2 rounded-full px-2 py-1.5 outline-none hover:bg-muted"
+            aria-label="Account menu"
+          >
+            <span className="hidden text-sm text-muted-foreground sm:inline">
               {userEmail ?? restaurantName}
             </span>
             {restaurantLogo ? (
@@ -70,9 +74,9 @@ export function Navbar({
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem
               onClick={() => logout()}
-              className="cursor-pointer text-red-600"
+              className="cursor-pointer text-destructive"
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4" aria-hidden />
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

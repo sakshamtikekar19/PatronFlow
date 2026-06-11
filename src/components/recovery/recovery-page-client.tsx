@@ -115,8 +115,9 @@ export function RecoveryPageClient({
           description="When a guest leaves a rating of 3 stars or less, it will appear here so you can follow up and win them back."
         />
       ) : (
-        <Card className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl">
-          <CardContent className="p-0">
+        <>
+        <Card className="hidden rounded-2xl border-0 bg-card shadow-card md:block">
+          <CardContent className="overflow-x-auto p-0">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -134,21 +135,21 @@ export function RecoveryPageClient({
                 {cases.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell>
-                      <div className="font-medium text-neutral-900">
+                      <div className="font-medium text-foreground">
                         {c.customer?.name ?? "Unknown"}
                       </div>
-                      <div className="text-xs text-neutral-500 md:hidden">
+                      <div className="text-xs text-muted-foreground md:hidden">
                         {c.customer?.phone}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-neutral-600">
+                    <TableCell className="hidden md:table-cell text-muted-foreground">
                       {c.customer?.phone ?? "—"}
                     </TableCell>
                     <TableCell>
                       <RatingStars rating={c.rating} size="sm" />
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                         {c.category}
                       </span>
                     </TableCell>
@@ -158,15 +159,15 @@ export function RecoveryPageClient({
                           type="button"
                           onClick={() => setCommentCase(c)}
                           title="Click to read full comment"
-                          className="block max-w-[240px] line-clamp-2 break-words text-left text-neutral-600 hover:text-neutral-900 hover:underline"
+                          className="block max-w-[240px] line-clamp-2 break-words text-left text-muted-foreground hover:text-foreground hover:underline"
                         >
                           {c.comment}
                         </button>
                       ) : (
-                        <span className="text-neutral-600">—</span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell whitespace-nowrap text-neutral-500">
+                    <TableCell className="hidden sm:table-cell whitespace-nowrap text-muted-foreground">
                       {formatDate(c.created_at)}
                     </TableCell>
                     <TableCell>
@@ -205,6 +206,7 @@ export function RecoveryPageClient({
                           variant="ghost"
                           size="icon-sm"
                           title="Internal notes"
+                          aria-label="Internal notes"
                           onClick={() => openNotes(c)}
                         >
                           <NotebookPen className="h-4 w-4" />
@@ -217,6 +219,86 @@ export function RecoveryPageClient({
             </Table>
           </CardContent>
         </Card>
+        <div className="space-y-3 md:hidden">
+          {cases.map((c) => (
+            <Card
+              key={c.id}
+              className="rounded-2xl border-0 bg-card shadow-card"
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground">
+                      {c.customer?.name ?? "Unknown"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {c.customer?.phone}
+                    </p>
+                  </div>
+                  <Badge
+                    variant="secondary"
+                    className={cn("shrink-0 border-0", STATUS_STYLES[c.recovery_status])}
+                  >
+                    {STATUS_LABEL[c.recovery_status]}
+                  </Badge>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <RatingStars rating={c.rating} size="sm" />
+                  <span className="text-xs text-muted-foreground">
+                    {formatDate(c.created_at)}
+                  </span>
+                </div>
+                {c.category && (
+                  <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {c.category}
+                  </span>
+                )}
+                {c.comment && (
+                  <button
+                    type="button"
+                    onClick={() => setCommentCase(c)}
+                    className="mt-2 block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    {c.comment}
+                  </button>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {c.recovery_status !== "contacted" &&
+                    c.recovery_status !== "resolved" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isPending && pendingId === c.id}
+                        onClick={() => setStatus(c.id, "contacted")}
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                        Contacted
+                      </Button>
+                    )}
+                  {c.recovery_status !== "resolved" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isPending && pendingId === c.id}
+                      onClick={() => setStatus(c.id, "resolved")}
+                    >
+                      Resolve
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Internal notes"
+                    onClick={() => openNotes(c)}
+                  >
+                    <NotebookPen className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        </>
       )}
 
       <Dialog
@@ -265,7 +347,7 @@ export function RecoveryPageClient({
           {commentCase && (
             <div className="space-y-4">
               <RatingStars rating={commentCase.rating} size="sm" />
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                 {commentCase.comment}
               </p>
             </div>

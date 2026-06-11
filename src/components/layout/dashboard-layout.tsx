@@ -34,7 +34,7 @@ export function DashboardLayout({
         <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
           {children}
         </main>
-        <footer className="flex flex-col items-center border-t border-neutral-100 px-4 py-6 text-center lg:px-8">
+        <footer className="flex flex-col items-center border-t border-border px-4 py-6 text-center lg:px-8">
           <Image
             src="/patronflowlogo.png"
             alt={BRAND.name}
@@ -42,7 +42,7 @@ export function DashboardLayout({
             height={375}
             className="h-6 w-auto"
           />
-          <p className="mt-1.5 text-xs text-neutral-400">{BRAND.tagline}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{BRAND.tagline}</p>
         </footer>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { buildReviewUrl } from "@/lib/review-url";
@@ -18,12 +19,10 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">Settings</h1>
-        <p className="mt-1 text-neutral-500">
-          Manage your restaurant profile, brand, and guest growth settings.
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage your restaurant profile, brand, and guest growth settings."
+      />
       <SettingsTabs
         restaurant={restaurant}
         reviewUrl={buildReviewUrl(restaurant.slug ?? restaurant.id)}

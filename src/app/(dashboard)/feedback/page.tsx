@@ -1,5 +1,6 @@
 import { FeedbackPageClient } from "@/components/feedback/feedback-page-client";
 import { ExportButton } from "@/components/export-button";
+import { PageHeader } from "@/components/page-header";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { getAllFeedback } from "@/lib/queries/feedback";
 import { redirect } from "next/navigation";
@@ -15,15 +16,13 @@ export default async function FeedbackPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-neutral-900">Feedback</h1>
-          <p className="mt-1 text-neutral-500">
-            Review and manage all customer feedback submissions.
-          </p>
-        </div>
-        <ExportButton endpoint="/api/export/feedback" label="Export Feedback" />
-      </div>
+      <PageHeader
+        title="Feedback"
+        description="Review and manage all customer feedback submissions."
+        actions={
+          <ExportButton endpoint="/api/export/feedback" label="Export Feedback" />
+        }
+      />
       <FeedbackPageClient initialFeedback={feedback} />
     </div>
   );

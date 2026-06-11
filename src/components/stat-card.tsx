@@ -12,20 +12,20 @@ export function StatCard({ title, value, icon, className }: StatCardProps) {
   return (
     <Card
       className={cn(
-        "border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl",
+        "h-full rounded-2xl border-0 bg-card shadow-card transition-shadow duration-200 hover:shadow-md",
         className
       )}
     >
       <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-neutral-500">{title}</p>
-            <p className="text-3xl font-semibold tracking-tight text-neutral-900">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <p className="text-3xl font-semibold tracking-tight text-foreground">
               {value}
             </p>
           </div>
           {icon && (
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-50 text-lg">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-lg">
               {icon}
             </div>
           )}

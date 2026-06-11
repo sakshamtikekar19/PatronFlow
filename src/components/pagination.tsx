@@ -25,7 +25,7 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-between gap-3 pt-2">
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-muted-foreground">
         Showing {start}–{end} of {totalItems}
       </p>
       <div className="flex items-center gap-2">
@@ -36,11 +36,11 @@ export function Pagination({
           aria-label="Previous page"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="rounded-lg border-neutral-200"
+          className="rounded-lg border-border"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-sm font-medium text-neutral-700">
+        <span className="text-sm font-medium text-foreground">
           {page} / {pageCount}
         </span>
         <Button
@@ -50,7 +50,7 @@ export function Pagination({
           aria-label="Next page"
           disabled={page >= pageCount}
           onClick={() => onPageChange(page + 1)}
-          className="rounded-lg border-neutral-200"
+          className="rounded-lg border-border"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

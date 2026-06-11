@@ -9,9 +9,10 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-geist-sans);
+  --shadow-card: var(--card-shadow);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -71,11 +72,14 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-1: oklch(0.205 0 0);
+  --chart-2: oklch(0.627 0.194 149.214);
+  --chart-3: oklch(0.705 0.191 47.604);
+  --chart-4: oklch(0.556 0 0);
+  --chart-5: oklch(0.87 0 0);
+  --chart-grid: oklch(0.95 0 0);
+  --chart-tick: oklch(0.708 0 0);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -106,11 +110,14 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-1: oklch(0.922 0 0);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.708 0 0);
+  --chart-5: oklch(0.439 0 0);
+  --chart-grid: oklch(1 0 0 / 8%);
+  --chart-tick: oklch(0.708 0 0);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -134,52 +141,30 @@
 }
 
 /*
- * Dark mode retrofit.
- * Most components use hardcoded light utilities (bg-white, text-neutral-900,
- * etc.). Page backgrounds use the token-based `bg-background`, which is already
- * dark-aware via the `.dark` token overrides above. Here we remap the remaining
- * hardcoded surface/text/border utilities for dark mode.
- *
- * NOTE: keep these selectors free of arbitrary-value classes (e.g. bg-[#fff]);
- * the escaped bracket syntax breaks the Tailwind v4 (Lightning CSS) parser and
- * silently drops the whole block.
+ * Public branded pages (review / RSVP) use a fixed light surface regardless of
+ * the visitor's OS theme. Lock the design tokens to their light values here so
+ * token-based text (text-foreground, muted, etc.) stays readable on the white
+ * card even when the visitor's system is in dark mode.
  */
-@layer utilities {
-  .dark .bg-white {
-    background-color: #18181b;
-  }
-  .dark .bg-neutral-50,
-  .dark .bg-neutral-50\/60 {
-    background-color: #232326;
-  }
-  .dark .bg-neutral-100 {
-    background-color: #27272a;
-  }
-  .dark .hover\:bg-neutral-50:hover,
-  .dark .hover\:bg-neutral-100:hover {
-    background-color: #27272a;
-  }
-
-  .dark .text-neutral-900 {
-    color: #f4f4f5;
-  }
-  .dark .text-neutral-700 {
-    color: #e4e4e7;
-  }
-  .dark .text-neutral-600 {
-    color: #d4d4d8;
-  }
-  .dark .text-neutral-500 {
-    color: #a1a1aa;
-  }
-  .dark .text-neutral-400 {
-    color: #71717a;
-  }
-
-  .dark .border-neutral-100 {
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-  .dark .border-neutral-200 {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
+.theme-light {
+  --background: #f5f2ed;
+  --foreground: #0a0a0a;
+  --surface: #ffffff;
+  --surface-muted: #fafaf8;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
 }

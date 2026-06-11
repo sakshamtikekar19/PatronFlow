@@ -180,20 +180,20 @@ export function ReviewForm({
           </span>
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-neutral-900">
+          <h2 className="text-xl font-semibold text-foreground">
             {response.message}
           </h2>
           {response.showGoogleReview ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               We&apos;d love if you could share your experience on Google too!
             </p>
           ) : response.showLoyaltyNudge ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Every visit earns you rewards — keep coming back for exciting
               offers!
             </p>
           ) : (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Your feedback helps us serve you better.
             </p>
           )}
@@ -217,19 +217,19 @@ export function ReviewForm({
               <span className="text-sm font-semibold">Loyalty rewards</span>
             </div>
             {response.loyaltyReward ? (
-              <p className="mt-2 text-sm text-neutral-600">
+              <p className="mt-2 text-sm text-muted-foreground">
                 You&apos;re earning points with every visit! Reach{" "}
-                <span className="font-semibold text-neutral-900">
+                <span className="font-semibold text-foreground">
                   {response.loyaltyReward.points} points
                 </span>{" "}
                 to unlock{" "}
-                <span className="font-semibold text-neutral-900">
+                <span className="font-semibold text-foreground">
                   {response.loyaltyReward.name}
                 </span>
                 . Ask our staff to add your points today.
               </p>
             ) : (
-              <p className="mt-2 text-sm text-neutral-600">
+              <p className="mt-2 text-sm text-muted-foreground">
                 You&apos;re one of our regulars now! Ask our staff about loyalty
                 points and exclusive offers on your next visit.
               </p>
@@ -256,14 +256,14 @@ export function ReviewForm({
             className="mx-auto h-16 w-16 rounded-2xl object-cover"
           />
         )}
-        <h1 className="text-2xl font-semibold text-neutral-900">
+        <h1 className="text-2xl font-semibold text-foreground">
           {restaurantName}
         </h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           We&apos;d love to hear about your experience
         </p>
         {tableName && (
-          <span className="inline-flex items-center rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600">
+          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
             {tableName}
           </span>
         )}
@@ -279,13 +279,13 @@ export function ReviewForm({
           placeholder="+91 98765 43210"
           required
           disabled={hasLookedUpGuest}
-          className="h-12 rounded-xl border-neutral-200 bg-white"
+          className="h-12 rounded-xl border-border bg-card"
         />
         {hasLookedUpGuest && (
           <button
             type="button"
             onClick={changePhone}
-            className="text-xs font-medium text-neutral-500 underline-offset-4 hover:text-neutral-900 hover:underline"
+            className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             Change phone number
           </button>
@@ -310,7 +310,7 @@ export function ReviewForm({
               onChange={(e) => setName(e.target.value)}
               placeholder="Aarav Sharma"
               required
-              className="h-12 rounded-xl border-neutral-200 bg-white"
+              className="h-12 rounded-xl border-border bg-card"
             />
           </div>
 
@@ -323,9 +323,9 @@ export function ReviewForm({
               onChange={(e) => setBirthday(e.target.value)}
               max={todayStr}
               required
-              className="h-12 rounded-xl border-neutral-200 bg-white"
+              className="h-12 rounded-xl border-border bg-card"
             />
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-muted-foreground">
               We&apos;ll surprise you with something special on your day.
             </p>
           </div>
@@ -354,7 +354,7 @@ export function ReviewForm({
                 val && setCategory(val as FeedbackCategory)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-neutral-200 bg-white">
+              <SelectTrigger className="h-12 rounded-xl border-border bg-card">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -375,7 +375,7 @@ export function ReviewForm({
               onChange={(e) => setComment(e.target.value)}
               placeholder="Tell us about your experience..."
               rows={4}
-              className="rounded-xl border-neutral-200 bg-white resize-none"
+              className="rounded-xl border-border bg-card resize-none"
             />
           </div>
         </>

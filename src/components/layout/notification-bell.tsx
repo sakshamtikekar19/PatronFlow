@@ -69,9 +69,9 @@ export function NotificationBell() {
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger
         aria-label="Notifications"
-        className="relative flex h-9 w-9 items-center justify-center rounded-full outline-none hover:bg-neutral-100"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full outline-none hover:bg-muted"
       >
-        <Bell className="h-5 w-5 text-neutral-600" />
+        <Bell className="h-5 w-5 text-muted-foreground" />
         {unreadCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -79,12 +79,12 @@ export function NotificationBell() {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0">
-        <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
-          <span className="text-sm font-semibold text-neutral-900">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <span className="text-sm font-semibold text-foreground">
             Notifications
           </span>
           {notifications.length > 0 && (
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-muted-foreground">
               {notifications.length}
             </span>
           )}
@@ -92,8 +92,8 @@ export function NotificationBell() {
         <div className="max-h-80 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <Bell className="mx-auto h-6 w-6 text-neutral-300" />
-              <p className="mt-2 text-sm text-neutral-500">
+              <Bell className="mx-auto h-6 w-6 text-muted-foreground/50" />
+              <p className="mt-2 text-sm text-muted-foreground">
                 You&apos;re all caught up
               </p>
             </div>
@@ -104,8 +104,8 @@ export function NotificationBell() {
                 <div
                   key={n.id}
                   className={cn(
-                    "flex gap-3 border-b border-neutral-50 px-4 py-3 last:border-0",
-                    isUnread && "bg-neutral-50/60"
+                    "flex gap-3 border-b border-border px-4 py-3 last:border-0",
+                    isUnread && "bg-muted/60"
                   )}
                 >
                   <span
@@ -117,13 +117,13 @@ export function NotificationBell() {
                     {ICONS[n.type]}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-sm font-medium text-foreground">
                       {n.title}
                     </p>
-                    <p className="truncate text-sm text-neutral-500">
+                    <p className="truncate text-sm text-muted-foreground">
                       {n.description}
                     </p>
-                    <p className="mt-0.5 text-xs text-neutral-400">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(n.createdAt), {
                         addSuffix: true,
                       })}

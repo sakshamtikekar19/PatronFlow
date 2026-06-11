@@ -7,7 +7,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RatingStars } from "@/components/rating-stars";
+import { EmptyState } from "@/components/empty-state";
 import type { TableQrAnalytics } from "@/types";
+import { QrCode } from "lucide-react";
 
 interface TableAnalyticsTableProps {
   data: TableQrAnalytics[];
@@ -16,42 +18,44 @@ interface TableAnalyticsTableProps {
 export function TableAnalyticsTable({ data }: TableAnalyticsTableProps) {
   if (data.length === 0) {
     return (
-      <p className="rounded-2xl bg-white p-8 text-center text-sm text-neutral-500 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-        No feedback has been collected yet. Once guests scan your QR codes,
-        per-table performance will appear here.
-      </p>
+      <EmptyState
+        icon={<QrCode className="h-6 w-6" />}
+        title="No table analytics yet"
+        description="Once guests scan your QR codes, per-table performance will appear here."
+        className="py-12"
+      />
     );
   }
 
   return (
     <>
       {/* Desktop */}
-      <div className="hidden overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] md:block">
+      <div className="hidden overflow-hidden rounded-2xl bg-card shadow-card md:block">
         <Table>
           <TableHeader>
-            <TableRow className="border-neutral-100 hover:bg-transparent">
-              <TableHead className="font-medium text-neutral-500">Table</TableHead>
-              <TableHead className="text-center font-medium text-neutral-500">
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="font-medium text-muted-foreground">Table</TableHead>
+              <TableHead className="text-center font-medium text-muted-foreground">
                 Feedback
               </TableHead>
-              <TableHead className="text-center font-medium text-neutral-500">
+              <TableHead className="text-center font-medium text-muted-foreground">
                 Review Clicks
               </TableHead>
-              <TableHead className="font-medium text-neutral-500">
+              <TableHead className="font-medium text-muted-foreground">
                 Avg Rating
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((row) => (
-              <TableRow key={row.tableName} className="border-neutral-100">
-                <TableCell className="font-medium text-neutral-900">
+              <TableRow key={row.tableName} className="border-border">
+                <TableCell className="font-medium text-foreground">
                   {row.tableName}
                 </TableCell>
-                <TableCell className="text-center text-neutral-600">
+                <TableCell className="text-center text-muted-foreground">
                   {row.feedbackCount}
                 </TableCell>
-                <TableCell className="text-center text-neutral-600">
+                <TableCell className="text-center text-muted-foreground">
                   {row.reviewCount}
                 </TableCell>
                 <TableCell>
@@ -61,12 +65,12 @@ export function TableAnalyticsTable({ data }: TableAnalyticsTableProps) {
                         rating={Math.round(row.averageRating)}
                         size="sm"
                       />
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-muted-foreground">
                         {row.averageRating}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-neutral-400">—</span>
+                    <span className="text-muted-foreground">—</span>
                   )}
                 </TableCell>
               </TableRow>
@@ -80,10 +84,10 @@ export function TableAnalyticsTable({ data }: TableAnalyticsTableProps) {
         {data.map((row) => (
           <div
             key={row.tableName}
-            className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+            className="rounded-2xl bg-card p-4 shadow-card"
           >
             <div className="flex items-center justify-between">
-              <span className="font-medium text-neutral-900">
+              <span className="font-medium text-foreground">
                 {row.tableName}
               </span>
               {row.feedbackCount > 0 && (
@@ -93,7 +97,7 @@ export function TableAnalyticsTable({ data }: TableAnalyticsTableProps) {
                 />
               )}
             </div>
-            <div className="mt-2 flex gap-4 text-xs text-neutral-500">
+            <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
               <span>{row.feedbackCount} feedback</span>
               <span>{row.reviewCount} review clicks</span>
               {row.feedbackCount > 0 && <span>{row.averageRating} avg</span>}

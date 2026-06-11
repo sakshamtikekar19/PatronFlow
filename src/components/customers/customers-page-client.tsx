@@ -85,19 +85,19 @@ export function CustomersPageClient({
               type="button"
               onClick={() => setActiveSegment(active ? "All" : seg)}
               className={cn(
-                "rounded-2xl border bg-white p-4 text-left transition-all",
+                "rounded-2xl border bg-card p-4 text-left transition-all",
                 active
-                  ? "border-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
-                  : "border-transparent shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:border-neutral-200"
+                  ? "border-foreground shadow-card ring-1 ring-foreground/10"
+                  : "border-transparent shadow-card hover:border-border"
               )}
             >
-              <p className="text-2xl font-semibold text-neutral-900">
+              <p className="text-2xl font-semibold text-foreground">
                 {counts[seg]}
               </p>
-              <p className="mt-0.5 text-sm font-medium text-neutral-700">
+              <p className="mt-0.5 text-sm font-medium text-foreground">
                 {seg}
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 {SEGMENT_DESCRIPTIONS[seg]}
               </p>
             </button>
@@ -115,7 +115,7 @@ export function CustomersPageClient({
           <button
             type="button"
             onClick={() => setActiveSegment("All")}
-            className="text-sm font-medium text-neutral-500 hover:text-neutral-900"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             Clear filter ({activeSegment})
           </button>

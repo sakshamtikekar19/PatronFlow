@@ -1,5 +1,8 @@
 import { Suspense } from "react";
-import { StatCard } from "@/components/stat-card";
+import {
+  DashboardStatGrid,
+  DashboardVisitStatGrid,
+} from "@/components/dashboard/dashboard-stat-grid";
 import { ChartCard } from "@/components/chart-card";
 import { DashboardSearch } from "@/components/dashboard/dashboard-search";
 import { RecentFeedbackTable } from "@/components/dashboard/recent-feedback-table";
@@ -23,6 +26,7 @@ import { getCustomerInsights } from "@/lib/queries/customer-insights";
 import { getVisitMetrics } from "@/lib/queries/visits";
 import { getRecoveryAnalytics } from "@/lib/queries/recovery";
 import { getUpcomingEvents } from "@/lib/queries/events";
+import { PageHeader } from "@/components/page-header";
 import { BRAND } from "@/config/branding";
 import { redirect } from "next/navigation";
 
@@ -64,57 +68,56 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-neutral-900 sm:text-3xl">
-          Welcome back to {BRAND.name}, {restaurant.name}
-        </h1>
-        <p className="text-neutral-500">
-          Track feedback, build customer relationships, and grow repeat
-          business.
-        </p>
-      </div>
+      <PageHeader
+        title={`Welcome back to ${BRAND.name}, ${restaurant.name}`}
+        description="Track feedback, build customer relationships, and grow repeat business."
+      />
 
       <Suspense fallback={<Skeleton className="h-12 w-full max-w-2xl mx-auto rounded-full" />}>
         <DashboardSearch initialSearch={search} />
       </Suspense>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard title="Average Rating" value={stats.averageRating || "—"} icon="⭐" />
-        <StatCard title="Total Feedback" value={stats.totalFeedback} icon="📝" />
-        <StatCard title="Total Customers" value={stats.totalCustomers} icon="👥" />
-        <StatCard
-          title="Positive Feedback %"
-          value={`${stats.positiveFeedbackPercent}%`}
-          icon="📈"
-        />
-        <StatCard
-          title="Review Conversion"
-          value={`${funnel.conversionRate}%`}
-          icon="🔗"
-        />
-      </div>
+      <DashboardStatGrid
+        stats={[
+          { title: "Average Rating", value: stats.averageRating || "—", icon: "⭐" },
+          { title: "Total Feedback", value: stats.totalFeedback, icon: "📝" },
+          { title: "Total Customers", value: stats.totalCustomers, icon: "👥" },
+          {
+            title: "Positive Feedback %",
+            value: `${stats.positiveFeedbackPercent}%`,
+            icon: "📈",
+          },
+          {
+            title: "Review Conversion",
+            value: `${funnel.conversionRate}%`,
+            icon: "🔗",
+          },
+        ]}
+      />
 
       <InsightsSection insights={insights} />
 
       <CustomerInsightsSection insights={customerInsights} />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Repeat Customers"
-          value={visitMetrics.repeatCustomers}
-          icon="🔁"
-        />
-        <StatCard
-          title="Repeat Rate"
-          value={`${visitMetrics.repeatRate}%`}
-          icon="📊"
-        />
-        <StatCard
-          title="Avg Visits / Customer"
-          value={visitMetrics.averageVisitsPerCustomer || "—"}
-          icon="👣"
-        />
-      </div>
+      <DashboardVisitStatGrid
+        stats={[
+          {
+            title: "Repeat Customers",
+            value: visitMetrics.repeatCustomers,
+            icon: "🔁",
+          },
+          {
+            title: "Repeat Rate",
+            value: `${visitMetrics.repeatRate}%`,
+            icon: "📊",
+          },
+          {
+            title: "Avg Visits / Customer",
+            value: visitMetrics.averageVisitsPerCustomer || "—",
+            icon: "👣",
+          },
+        ]}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <RecoveryWidget analytics={recoveryAnalytics} />
@@ -133,7 +136,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </ChartCard>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-neutral-900">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">
           Recent Feedback
         </h2>
         <RecentFeedbackTable feedback={recentFeedback} />

@@ -9,8 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RatingStars } from "@/components/rating-stars";
+import { EmptyState } from "@/components/empty-state";
 import { formatDateTime } from "@/lib/utils";
 import type { FeedbackWithCustomer } from "@/types";
+import { MessageSquare } from "lucide-react";
 
 interface RecentFeedbackTableProps {
   feedback: FeedbackWithCustomer[];
@@ -19,44 +21,47 @@ interface RecentFeedbackTableProps {
 export function RecentFeedbackTable({ feedback }: RecentFeedbackTableProps) {
   if (feedback.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-neutral-500">
-        No feedback yet. Share your review link to start collecting feedback.
-      </p>
+      <EmptyState
+        icon={<MessageSquare className="h-6 w-6" />}
+        title="No feedback yet"
+        description="Share your review link to start collecting feedback from guests."
+        className="py-12"
+      />
     );
   }
 
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:block overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="hidden overflow-hidden rounded-2xl bg-card shadow-card md:block">
         <Table>
           <TableHeader>
-            <TableRow className="border-neutral-100 hover:bg-transparent">
-              <TableHead className="text-neutral-500 font-medium">Customer</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Rating</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Category</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Comment</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Date</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="font-medium text-muted-foreground">Customer</TableHead>
+              <TableHead className="font-medium text-muted-foreground">Rating</TableHead>
+              <TableHead className="font-medium text-muted-foreground">Category</TableHead>
+              <TableHead className="font-medium text-muted-foreground">Comment</TableHead>
+              <TableHead className="font-medium text-muted-foreground">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {feedback.map((item) => (
-              <TableRow key={item.id} className="border-neutral-100">
-                <TableCell className="font-medium text-neutral-900">
+              <TableRow key={item.id} className="border-border">
+                <TableCell className="font-medium text-foreground">
                   {item.customer?.name ?? "Unknown"}
                 </TableCell>
                 <TableCell>
                   <RatingStars rating={item.rating} size="sm" />
                 </TableCell>
                 <TableCell>
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                     {item.category}
                   </span>
                 </TableCell>
-                <TableCell className="max-w-xs truncate text-neutral-600">
+                <TableCell className="max-w-xs truncate text-muted-foreground">
                   {item.comment ?? "—"}
                 </TableCell>
-                <TableCell className="text-neutral-500 text-sm">
+                <TableCell className="text-sm text-muted-foreground">
                   {formatDateTime(item.created_at)}
                 </TableCell>
               </TableRow>
@@ -66,26 +71,26 @@ export function RecentFeedbackTable({ feedback }: RecentFeedbackTableProps) {
       </div>
 
       {/* Mobile */}
-      <div className="md:hidden space-y-3">
+      <div className="space-y-3 md:hidden">
         {feedback.map((item) => (
           <div
             key={item.id}
-            className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+            className="rounded-2xl bg-card p-4 shadow-card"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-neutral-900">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-medium text-foreground">
                 {item.customer?.name ?? "Unknown"}
               </span>
               <RatingStars rating={item.rating} size="sm" />
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral-500 mb-2">
-              <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-medium text-neutral-600">
+            <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground">
                 {item.category}
               </span>
               <span>{formatDateTime(item.created_at)}</span>
             </div>
             {item.comment && (
-              <p className="text-sm text-neutral-600 line-clamp-2">{item.comment}</p>
+              <p className="line-clamp-2 text-sm text-muted-foreground">{item.comment}</p>
             )}
           </div>
         ))}

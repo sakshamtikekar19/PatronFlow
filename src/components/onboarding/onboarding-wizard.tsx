@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FieldError, FieldLabel } from "@/components/form-label";
 import {
   Select,
   SelectContent,
@@ -129,7 +129,7 @@ export function OnboardingWizard({
                 "flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors",
                 i < step && "bg-neutral-900 text-white",
                 i === step && "bg-neutral-900 text-white",
-                i > step && "bg-neutral-200 text-neutral-500"
+                i > step && "bg-neutral-200 text-muted-foreground"
               )}
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
@@ -146,39 +146,43 @@ export function OnboardingWizard({
         ))}
       </div>
 
-      <div className="rounded-2xl bg-white p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="rounded-2xl bg-card p-8 shadow-card">
         {/* Step 1: Restaurant info */}
         {step === 0 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl font-semibold text-neutral-900">
+              <h2 className="text-xl font-semibold text-foreground">
                 Tell us about your restaurant
               </h2>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 This appears on your feedback page.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Restaurant Name *</Label>
+              <FieldLabel htmlFor="name" required>
+                Restaurant name
+              </FieldLabel>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="The Corner Bistro"
-                className="h-11 rounded-xl border-neutral-200"
+                className="h-11 rounded-xl border-border"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cuisine">Cuisine Type</Label>
+              <FieldLabel htmlFor="cuisine" optional>
+                Cuisine type
+              </FieldLabel>
               <Select
                 value={cuisineType}
                 onValueChange={(v) => v && setCuisineType(v)}
               >
                 <SelectTrigger
                   id="cuisine"
-                  className="h-11 rounded-xl border-neutral-200"
+                  className="h-11 rounded-xl border-border"
                 >
                   <SelectValue placeholder="Select cuisine" />
                 </SelectTrigger>
@@ -193,7 +197,7 @@ export function OnboardingWizard({
             </div>
 
             <div className="space-y-2">
-              <Label>Logo</Label>
+              <FieldLabel optional>Logo</FieldLabel>
               <div className="flex items-center gap-4">
                 {logoUrl ? (
                   <Image
@@ -205,7 +209,7 @@ export function OnboardingWizard({
                     className="h-14 w-14 rounded-xl object-cover"
                   />
                 ) : (
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 text-lg font-medium text-neutral-400">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-muted text-lg font-medium text-muted-foreground">
                     {name.charAt(0).toUpperCase() || "?"}
                   </div>
                 )}
@@ -216,7 +220,7 @@ export function OnboardingWizard({
                     onChange={handleLogoChange}
                     className="hidden"
                   />
-                  <span className="inline-flex h-10 items-center rounded-xl border border-neutral-200 px-4 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+                  <span className="inline-flex h-10 items-center rounded-xl border border-border px-4 text-sm font-medium text-foreground hover:bg-muted">
                     <Upload className="mr-2 h-4 w-4" />
                     {isUploading ? "Uploading..." : "Upload logo"}
                   </span>
@@ -230,24 +234,26 @@ export function OnboardingWizard({
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl font-semibold text-neutral-900">
+              <h2 className="text-xl font-semibold text-foreground">
                 Connect your review experience
               </h2>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Happy guests (4-5 stars) will be sent here to leave a public
                 review and become loyal patrons.
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="google">Google Review URL</Label>
+              <FieldLabel htmlFor="google" optional>
+                Google review URL
+              </FieldLabel>
               <Input
                 id="google"
                 value={googleReviewUrl}
                 onChange={(e) => setGoogleReviewUrl(e.target.value)}
                 placeholder="https://g.page/r/..."
-                className="h-11 rounded-xl border-neutral-200"
+                className="h-11 rounded-xl border-border"
               />
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 You can add or change this later in Settings.
               </p>
             </div>
@@ -258,10 +264,10 @@ export function OnboardingWizard({
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl font-semibold text-neutral-900">
+              <h2 className="text-xl font-semibold text-foreground">
                 Generate your {BRAND.name} QR
               </h2>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Place this where guests can scan it. You can make table-specific
                 codes later.
               </p>
@@ -283,10 +289,10 @@ export function OnboardingWizard({
               <PartyPopper className="h-8 w-8 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-neutral-900">
+              <h2 className="text-xl font-semibold text-foreground">
                 You&apos;re all set!
               </h2>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {name || restaurant.name} is ready to start collecting feedback
                 and growing customer loyalty.
               </p>
@@ -302,7 +308,7 @@ export function OnboardingWizard({
                     restaurantLogo: logoUrl || restaurant.logo,
                   })
                 }
-                className="h-11 rounded-xl border-neutral-200"
+                className="h-11 rounded-xl border-border"
               >
                 <Printer className="mr-2 h-4 w-4" />
                 Print QR Poster
@@ -311,7 +317,7 @@ export function OnboardingWizard({
                 href={reviewUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted"
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Open Feedback Page
@@ -320,11 +326,9 @@ export function OnboardingWizard({
           </div>
         )}
 
-        {error && (
-          <p className="mt-4 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600">
-            {error}
-          </p>
-        )}
+        <div className="mt-4">
+          <FieldError message={error} />
+        </div>
 
         {/* Navigation */}
         <div className="mt-8 flex items-center justify-between">
@@ -334,7 +338,7 @@ export function OnboardingWizard({
               variant="ghost"
               onClick={() => setStep(step - 1)}
               disabled={isPending}
-              className="text-neutral-500"
+              className="text-muted-foreground"
             >
               <ChevronLeft className="mr-1 h-4 w-4" />
               Back
@@ -372,7 +376,7 @@ export function OnboardingWizard({
           type="button"
           onClick={handleFinish}
           disabled={isPending}
-          className="text-sm text-neutral-400 hover:text-neutral-600"
+          className="text-sm text-muted-foreground hover:text-muted-foreground"
         >
           Skip for now
         </button>

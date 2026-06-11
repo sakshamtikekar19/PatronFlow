@@ -19,7 +19,7 @@ export default async function PublicEventPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] flex flex-col items-center justify-center p-4">
+    <div className="theme-light min-h-screen bg-[#F5F2ED] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-8">
         <RsvpForm
           eventId={event.id}

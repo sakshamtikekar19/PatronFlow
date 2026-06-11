@@ -28,18 +28,18 @@ export function CustomerTable({
   return (
     <>
       {/* Desktop table */}
-      <div className={cn("hidden md:block rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-hidden", className)}>
+      <div className={cn("hidden md:block rounded-2xl bg-card shadow-card overflow-hidden", className)}>
         <Table>
           <TableHeader>
-            <TableRow className="border-neutral-100 hover:bg-transparent">
-              <TableHead className="text-neutral-500 font-medium">Name</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Phone</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Email</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Birthday</TableHead>
-              <TableHead className="text-neutral-500 font-medium text-center">Visits</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Avg Rating</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Segment</TableHead>
-              <TableHead className="text-neutral-500 font-medium">Last Visit</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-muted-foreground font-medium">Name</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Phone</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Email</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Birthday</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-center">Visits</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Avg Rating</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Segment</TableHead>
+              <TableHead className="text-muted-foreground font-medium">Last Visit</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -47,37 +47,37 @@ export function CustomerTable({
               <TableRow
                 key={customer.id}
                 onClick={() => onCustomerClick(customer)}
-                className="cursor-pointer border-neutral-100 hover:bg-neutral-50"
+                className="cursor-pointer border-border hover:bg-muted"
               >
-                <TableCell className="font-medium text-neutral-900">
+                <TableCell className="font-medium text-foreground">
                   {customer.name}
                 </TableCell>
-                <TableCell className="text-neutral-600">{customer.phone}</TableCell>
-                <TableCell className="text-neutral-600">
+                <TableCell className="text-muted-foreground">{customer.phone}</TableCell>
+                <TableCell className="text-muted-foreground">
                   {customer.email ?? "—"}
                 </TableCell>
-                <TableCell className="text-neutral-600">
+                <TableCell className="text-muted-foreground">
                   {formatBirthday(customer.birthday)}
                 </TableCell>
-                <TableCell className="text-center text-neutral-600">
+                <TableCell className="text-center text-muted-foreground">
                   {customer.visits}
                 </TableCell>
                 <TableCell>
                   {customer.visits > 0 ? (
                     <div className="flex items-center gap-2">
                       <RatingStars rating={Math.round(customer.average_rating)} size="sm" />
-                      <span className="text-sm text-neutral-500">
+                      <span className="text-sm text-muted-foreground">
                         {customer.average_rating}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-neutral-400">—</span>
+                    <span className="text-muted-foreground">—</span>
                   )}
                 </TableCell>
                 <TableCell>
                   <SegmentBadge segment={customer.segment} />
                 </TableCell>
-                <TableCell className="text-neutral-600">
+                <TableCell className="text-muted-foreground">
                   {customer.last_visit ? formatDate(customer.last_visit) : "—"}
                 </TableCell>
               </TableRow>
@@ -93,16 +93,16 @@ export function CustomerTable({
             key={customer.id}
             type="button"
             onClick={() => onCustomerClick(customer)}
-            className="w-full rounded-2xl bg-white p-4 text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-colors hover:bg-neutral-50"
+            className="w-full rounded-2xl bg-card p-4 text-left shadow-card transition-colors hover:bg-muted"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-medium text-neutral-900">{customer.name}</p>
-                <p className="text-sm text-neutral-500">{customer.phone}</p>
+                <p className="font-medium text-foreground">{customer.name}</p>
+                <p className="text-sm text-muted-foreground">{customer.phone}</p>
               </div>
               <SegmentBadge segment={customer.segment} />
             </div>
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span>{customer.visits} visits</span>
               {customer.birthday && (
                 <span>🎂 {formatBirthday(customer.birthday)}</span>

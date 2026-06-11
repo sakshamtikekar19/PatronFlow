@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { RecoveryPageClient } from "@/components/recovery/recovery-page-client";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import {
@@ -20,15 +21,10 @@ export default async function RecoveryPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">
-          Guest Recovery
-        </h1>
-        <p className="mt-1 text-neutral-500">
-          Turn negative experiences into recovered customers. Follow up on every
-          unhappy guest.
-        </p>
-      </div>
+      <PageHeader
+        title="Guest Recovery"
+        description="Turn negative experiences into recovered customers. Follow up on every unhappy guest."
+      />
       <RecoveryPageClient cases={cases} analytics={analytics} />
     </div>
   );

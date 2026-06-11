@@ -12,7 +12,7 @@ const OPTIONS = [
 ] as const;
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,12 +26,16 @@ export function ThemeToggle() {
   }, []);
 
   const current = mounted ? theme : undefined;
+  const systemLabel =
+    mounted && resolvedTheme
+      ? `System (${resolvedTheme === "dark" ? "Dark" : "Light"})`
+      : "System";
 
   return (
     <div
       role="radiogroup"
       aria-label="Theme"
-      className="inline-flex rounded-xl border border-neutral-200 p-1"
+      className="inline-flex rounded-xl border border-border bg-card p-1"
     >
       {OPTIONS.map(({ value, label, icon: Icon }) => (
         <button
@@ -41,14 +45,14 @@ export function ThemeToggle() {
           aria-checked={current === value}
           onClick={() => setTheme(value)}
           className={cn(
-            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             current === value
-              ? "bg-neutral-900 text-white"
-              : "text-neutral-500 hover:text-neutral-900"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
-          <Icon className="h-4 w-4" />
-          {label}
+          <Icon className="h-4 w-4" aria-hidden />
+          {value === "system" ? systemLabel : label}
         </button>
       ))}
     </div>

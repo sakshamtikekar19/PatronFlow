@@ -41,7 +41,7 @@ export function SearchBar({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
-        className="h-12 rounded-full border-neutral-200 bg-white pl-5 pr-14 text-base shadow-sm placeholder:text-neutral-400 focus-visible:ring-neutral-300"
+        className="h-12 rounded-full border-border bg-card pl-5 pr-14 text-base shadow-sm placeholder:text-muted-foreground focus-visible:ring-neutral-300"
         autoComplete="off"
       />
       <button
@@ -54,11 +54,11 @@ export function SearchBar({
       </button>
 
       {showDropdown && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
           {isLoading ? (
-            <div className="px-4 py-3 text-sm text-neutral-500">Searching...</div>
+            <div className="px-4 py-3 text-sm text-muted-foreground">Searching...</div>
           ) : suggestions.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-neutral-500">
+            <div className="px-4 py-3 text-sm text-muted-foreground">
               No results for &ldquo;{value}&rdquo;
             </div>
           ) : (
@@ -67,13 +67,13 @@ export function SearchBar({
                 <li key={`${suggestion.type}-${suggestion.id}`}>
                   <button
                     type="button"
-                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
                     onMouseDown={(e) => {
                       e.preventDefault();
                       onSelect?.(suggestion);
                     }}
                   >
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                       {suggestion.type === "customer" ? (
                         <User className="h-4 w-4" />
                       ) : (
@@ -81,16 +81,16 @@ export function SearchBar({
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-neutral-900">
+                      <span className="block truncate text-sm font-medium text-foreground">
                         {suggestion.label}
                       </span>
                       {suggestion.sublabel && (
-                        <span className="block truncate text-xs text-neutral-500">
+                        <span className="block truncate text-xs text-muted-foreground">
                           {suggestion.sublabel}
                         </span>
                       )}
                     </span>
-                    <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-neutral-500">
+                    <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                       {suggestion.type}
                     </span>
                   </button>

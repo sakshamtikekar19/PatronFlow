@@ -72,21 +72,21 @@ export function QrCodeCard({
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]",
+        "rounded-2xl bg-card p-6 shadow-card",
         className
       )}
     >
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-neutral-900">{title}</h3>
+        <h3 className="text-base font-semibold text-foreground">{title}</h3>
         {subtitle && (
-          <p className="mt-0.5 text-sm text-neutral-500">{subtitle}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
         )}
       </div>
 
       <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
         <div
           className={cn(
-            "flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-100 bg-white",
+            "flex shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card",
             compact ? "h-36 w-36" : "h-44 w-44"
           )}
         >
@@ -100,13 +100,13 @@ export function QrCodeCard({
               className="h-full w-full object-contain p-2"
             />
           ) : (
-            <QrCodeIcon className="h-10 w-10 animate-pulse text-neutral-200" />
+            <QrCodeIcon className="h-10 w-10 animate-pulse text-muted-foreground/40" />
           )}
         </div>
 
         <div className="flex w-full flex-1 flex-col gap-3">
-          <div className="rounded-xl bg-neutral-50 px-3 py-2.5">
-            <p className="break-all text-xs text-neutral-600">{url}</p>
+          <div className="rounded-xl bg-muted px-3 py-2.5">
+            <p className="break-all text-xs text-muted-foreground">{url}</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -116,7 +116,7 @@ export function QrCodeCard({
               size="sm"
               onClick={handleDownloadPng}
               disabled={!dataUrl}
-              className="rounded-xl border-neutral-200"
+              className="rounded-xl border-border"
             >
               <Download className="mr-1.5 h-3.5 w-3.5" />
               PNG
@@ -126,7 +126,7 @@ export function QrCodeCard({
               variant="outline"
               size="sm"
               onClick={handleDownloadSvg}
-              className="rounded-xl border-neutral-200"
+              className="rounded-xl border-border"
             >
               <Download className="mr-1.5 h-3.5 w-3.5" />
               SVG
@@ -136,7 +136,7 @@ export function QrCodeCard({
               variant="outline"
               size="sm"
               onClick={handleCopy}
-              className="rounded-xl border-neutral-200"
+              className="rounded-xl border-border"
             >
               {copied ? (
                 <>

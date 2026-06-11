@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FieldLabel } from "@/components/form-label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -65,7 +65,7 @@ import type {
 import { toast } from "sonner";
 
 const STATUS_STYLES: Record<EventStatus, string> = {
-  draft: "bg-neutral-100 text-neutral-600",
+  draft: "bg-muted text-muted-foreground",
   published: "bg-emerald-50 text-emerald-700",
   completed: "bg-blue-50 text-blue-700",
 };
@@ -286,7 +286,7 @@ export function EventsPageClient({
 
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-neutral-900">All Events</h2>
+          <h2 className="text-lg font-semibold text-foreground">All Events</h2>
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" />
             Create event
@@ -310,10 +310,10 @@ export function EventsPageClient({
             {events.map((e) => (
               <Card
                 key={e.id}
-                className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden"
+                className="border-0 bg-card shadow-card rounded-2xl overflow-hidden"
               >
                 {e.cover_image && (
-                  <div className="aspect-[16/6] w-full overflow-hidden bg-neutral-100">
+                  <div className="aspect-[16/6] w-full overflow-hidden bg-muted">
                     <Image
                       src={e.cover_image}
                       alt={e.title}
@@ -328,7 +328,7 @@ export function EventsPageClient({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="truncate font-semibold text-neutral-900">
+                        <h3 className="truncate font-semibold text-foreground">
                           {e.title}
                         </h3>
                         <Badge
@@ -338,7 +338,7 @@ export function EventsPageClient({
                           {e.status}
                         </Badge>
                       </div>
-                      <p className="mt-1 text-sm text-neutral-500">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {e.event_date
                           ? formatDate(e.event_date)
                           : "No date set"}
@@ -347,7 +347,11 @@ export function EventsPageClient({
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={
-                          <Button variant="ghost" size="icon-sm">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Event actions"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         }
@@ -397,33 +401,33 @@ export function EventsPageClient({
                   </div>
 
                   {e.description && (
-                    <p className="mt-3 line-clamp-2 text-sm text-neutral-600">
+                    <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
                       {e.description}
                     </p>
                   )}
 
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-xl bg-neutral-50 py-2.5">
-                      <p className="text-base font-semibold text-neutral-900">
+                    <div className="rounded-xl bg-muted py-2.5">
+                      <p className="text-base font-semibold text-foreground">
                         {e.rsvpCount}
                       </p>
-                      <p className="text-xs text-neutral-500">RSVPs</p>
+                      <p className="text-xs text-muted-foreground">RSVPs</p>
                     </div>
-                    <div className="rounded-xl bg-neutral-50 py-2.5">
-                      <p className="text-base font-semibold text-neutral-900">
+                    <div className="rounded-xl bg-muted py-2.5">
+                      <p className="text-base font-semibold text-foreground">
                         {e.attendedCount}
                       </p>
-                      <p className="text-xs text-neutral-500">Attended</p>
+                      <p className="text-xs text-muted-foreground">Attended</p>
                     </div>
-                    <div className="rounded-xl bg-neutral-50 py-2.5">
-                      <p className="text-base font-semibold text-neutral-900">
+                    <div className="rounded-xl bg-muted py-2.5">
+                      <p className="text-base font-semibold text-foreground">
                         {e.conversionRate}%
                       </p>
-                      <p className="text-xs text-neutral-500">Conversion</p>
+                      <p className="text-xs text-muted-foreground">Conversion</p>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2">
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -481,7 +485,9 @@ export function EventsPageClient({
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="event-title">Title</Label>
+              <FieldLabel htmlFor="event-title" required>
+                Title
+              </FieldLabel>
               <Input
                 id="event-title"
                 value={title}
@@ -490,7 +496,9 @@ export function EventsPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="event-date">Date &amp; time</Label>
+              <FieldLabel htmlFor="event-date" required>
+                Date &amp; time
+              </FieldLabel>
               <Input
                 id="event-date"
                 type="datetime-local"
@@ -500,7 +508,7 @@ export function EventsPageClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Cover image (optional)</Label>
+              <FieldLabel optional>Cover image</FieldLabel>
               <input
                 ref={coverInputRef}
                 type="file"
@@ -545,18 +553,20 @@ export function EventsPageClient({
                   type="button"
                   disabled={isUploadingCover}
                   onClick={() => coverInputRef.current?.click()}
-                  className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 py-5 text-sm text-neutral-500 transition hover:border-neutral-400 hover:bg-neutral-100 disabled:opacity-60"
+                  className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted py-5 text-sm text-muted-foreground transition hover:border-foreground/20 hover:bg-muted disabled:opacity-60"
                 >
                   <ImageIcon className="h-5 w-5" />
                   {isUploadingCover ? "Uploading..." : "Upload a photo"}
-                  <span className="text-xs text-neutral-400">
+                  <span className="text-xs text-muted-foreground">
                     PNG, JPG or WEBP · up to 5MB
                   </span>
                 </button>
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="event-desc">Description (optional)</Label>
+              <FieldLabel htmlFor="event-desc" optional>
+                Description
+              </FieldLabel>
               <Textarea
                 id="event-desc"
                 value={description}
@@ -618,20 +628,25 @@ export function EventsPageClient({
           </SheetHeader>
           <div className="space-y-2 p-4">
             {rsvpLoading ? (
-              <p className="text-sm text-neutral-500">Loading RSVPs…</p>
+              <p className="text-sm text-muted-foreground">Loading RSVPs…</p>
             ) : rsvps.length === 0 ? (
-              <p className="text-sm text-neutral-500">No RSVPs yet.</p>
+              <EmptyState
+                icon={<Users className="h-6 w-6" />}
+                title="No RSVPs yet"
+                description="Share the event page or QR code so guests can reserve their spot."
+                className="border-0 bg-transparent py-8 shadow-none"
+              />
             ) : (
               rsvps.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                  className="flex items-center justify-between gap-3 rounded-xl bg-card p-3 shadow-card"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-neutral-900">
+                    <p className="truncate font-medium text-foreground">
                       {r.name}
                     </p>
-                    <p className="truncate text-xs text-neutral-500">
+                    <p className="truncate text-xs text-muted-foreground">
                       {r.phone}
                       {r.email ? ` · ${r.email}` : ""}
                     </p>

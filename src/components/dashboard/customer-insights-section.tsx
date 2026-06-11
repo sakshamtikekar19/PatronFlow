@@ -25,24 +25,24 @@ function InsightCard({
   tone = "neutral",
 }: InsightCardProps) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <div className="rounded-2xl bg-card p-5 shadow-card">
       <div className="flex items-center gap-2">
         <span
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-lg",
             tone === "positive" && "bg-emerald-50 text-emerald-600",
             tone === "negative" && "bg-red-50 text-red-600",
-            tone === "neutral" && "bg-neutral-100 text-neutral-500"
+            tone === "neutral" && "bg-muted text-muted-foreground"
           )}
         >
           {icon}
         </span>
-        <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {label}
         </span>
       </div>
-      <p className="mt-3 text-lg font-semibold text-neutral-900">{value}</p>
-      {hint && <p className="mt-0.5 text-sm text-neutral-500">{hint}</p>}
+      <p className="mt-3 text-lg font-semibold text-foreground">{value}</p>
+      {hint && <p className="mt-0.5 text-sm text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -54,7 +54,7 @@ export function CustomerInsightsSection({
 }) {
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold text-neutral-900">
+      <h2 className="mb-4 text-lg font-semibold text-foreground">
         Customer Insights
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

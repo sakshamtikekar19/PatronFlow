@@ -13,14 +13,14 @@ function FunnelStep({ label, value, total, tone }: FunnelStepProps) {
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between text-sm">
-        <span className="font-medium text-neutral-700">{label}</span>
-        <span className="text-neutral-500">{value}</span>
+        <span className="font-medium text-foreground">{label}</span>
+        <span className="text-muted-foreground">{value}</span>
       </div>
-      <div className="h-9 w-full overflow-hidden rounded-xl bg-neutral-100">
+      <div className="h-9 w-full overflow-hidden rounded-xl bg-muted">
         <div
           className={cn(
             "flex h-full items-center rounded-xl transition-all",
-            tone === "neutral" && "bg-neutral-900",
+            tone === "neutral" && "bg-foreground",
             tone === "positive" && "bg-emerald-500",
             tone === "accent" && "bg-orange-400"
           )}
@@ -33,17 +33,17 @@ function FunnelStep({ label, value, total, tone }: FunnelStepProps) {
 
 export function ReviewFunnel({ funnel }: { funnel: ReviewFunnelData }) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <div className="rounded-2xl bg-card p-6 shadow-card">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold text-neutral-900">Review Funnel</h3>
+        <h3 className="text-base font-semibold text-foreground">Review Funnel</h3>
         <div className="flex items-center gap-1.5">
-          <span className="text-2xl font-semibold text-neutral-900">
+          <span className="text-2xl font-semibold text-foreground">
             {funnel.conversionRate}%
           </span>
-          <span className="text-sm text-neutral-500">conversion</span>
+          <span className="text-sm text-muted-foreground">conversion</span>
         </div>
       </div>
-      <p className="mt-0.5 text-sm text-neutral-500">
+      <p className="mt-0.5 text-sm text-muted-foreground">
         Google review clicks ÷ positive feedback
       </p>
 
@@ -68,7 +68,7 @@ export function ReviewFunnel({ funnel }: { funnel: ReviewFunnelData }) {
         />
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 border-t border-neutral-100 pt-4">
+      <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4">
         <div className="rounded-xl bg-emerald-50 px-4 py-3">
           <p className="text-xs font-medium text-emerald-700">Positive</p>
           <p className="text-lg font-semibold text-emerald-700">

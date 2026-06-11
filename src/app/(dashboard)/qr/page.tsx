@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { QrCodeCard } from "@/components/qr/qr-code-card";
 import { TableQrManager } from "@/components/qr/table-qr-manager";
 import { TableAnalyticsTable } from "@/components/qr/table-analytics-table";
@@ -22,16 +23,14 @@ export default async function QrPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">QR Codes</h1>
-        <p className="mt-1 text-neutral-500">
-          Generate and manage QR codes that send guests to your feedback page.
-        </p>
-      </div>
+      <PageHeader
+        title="QR Codes"
+        description="Generate and manage QR codes that send guests to your feedback page."
+      />
 
       {/* Main restaurant QR */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-neutral-900">
+        <h2 className="text-lg font-semibold text-foreground">
           Main Feedback QR
         </h2>
         <QrCodeCard
@@ -44,7 +43,7 @@ export default async function QrPage() {
 
       {/* Table-specific QRs */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-neutral-900">
+        <h2 className="text-lg font-semibold text-foreground">
           Table QR Codes
         </h2>
         <TableQrManager
@@ -55,7 +54,7 @@ export default async function QrPage() {
 
       {/* Per-table analytics */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-neutral-900">
+        <h2 className="text-lg font-semibold text-foreground">
           QR Performance
         </h2>
         <TableAnalyticsTable data={analytics} />

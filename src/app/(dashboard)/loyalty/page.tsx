@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { LoyaltyPageClient } from "@/components/loyalty/loyalty-page-client";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import {
@@ -24,14 +25,10 @@ export default async function LoyaltyPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">
-          Loyalty Program
-        </h1>
-        <p className="mt-1 text-neutral-500">
-          Reward your regulars with points and keep them coming back.
-        </p>
-      </div>
+      <PageHeader
+        title="Loyalty Program"
+        description="Reward your regulars with points and keep them coming back."
+      />
       <LoyaltyPageClient
         stats={stats}
         rules={rules}

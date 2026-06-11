@@ -7,7 +7,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="light"
+      defaultTheme="system"
       enableSystem
       disableTransitionOnChange
     >
@@ -17,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         theme="system"
         toastOptions={{
           classNames: {
-            toast: "rounded-xl border border-neutral-100",
+            toast: "rounded-xl border border-border bg-card text-card-foreground shadow-card",
           },
         }}
       />

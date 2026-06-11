@@ -100,7 +100,7 @@ export function FeedbackPageClient({
 
       <div className="flex flex-wrap gap-3">
         <Select value={ratingFilter} onValueChange={(v) => v && handleRating(v)}>
-          <SelectTrigger className="w-full rounded-full border-neutral-200 bg-white sm:w-36">
+          <SelectTrigger className="w-full rounded-full border-border bg-card sm:w-36">
             <SelectValue placeholder="Rating" />
           </SelectTrigger>
           <SelectContent>
@@ -114,7 +114,7 @@ export function FeedbackPageClient({
         </Select>
 
         <Select value={categoryFilter} onValueChange={(v) => v && handleCategory(v)}>
-          <SelectTrigger className="w-full rounded-full border-neutral-200 bg-white sm:w-40">
+          <SelectTrigger className="w-full rounded-full border-border bg-card sm:w-40">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -128,7 +128,7 @@ export function FeedbackPageClient({
         </Select>
 
         <Select value={dateFilter} onValueChange={(v) => v && handleDate(v)}>
-          <SelectTrigger className="w-40 rounded-full border-neutral-200 bg-white">
+          <SelectTrigger className="w-40 rounded-full border-border bg-card">
             <SelectValue placeholder="Date" />
           </SelectTrigger>
           <SelectContent>

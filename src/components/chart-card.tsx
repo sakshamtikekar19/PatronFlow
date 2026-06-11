@@ -17,16 +17,16 @@ export function ChartCard({
   return (
     <Card
       className={cn(
-        "border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl",
+        "rounded-2xl border-0 bg-card shadow-card",
         className
       )}
     >
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-neutral-900">
+        <CardTitle className="text-base font-semibold text-foreground">
           {title}
         </CardTitle>
         {description && (
-          <p className="text-sm text-neutral-500">{description}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </CardHeader>
       <CardContent className="pt-0">{children}</CardContent>

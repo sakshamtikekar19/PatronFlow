@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FieldError, FieldLabel } from "@/components/form-label";
 import { Input } from "@/components/ui/input";
 import { QrCodeCard } from "@/components/qr/qr-code-card";
 import { EmptyState } from "@/components/empty-state";
@@ -76,41 +77,50 @@ export function TableQrManager({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-        <h3 className="text-base font-semibold text-neutral-900">
+      <div className="rounded-2xl bg-card p-6 shadow-card">
+        <h3 className="text-base font-semibold text-foreground">
           Add a Table QR
         </h3>
-        <p className="mt-0.5 text-sm text-neutral-500">
+        <p className="mt-0.5 text-sm text-muted-foreground">
           Create a unique QR code per table to track where feedback comes from.
         </p>
 
-        <form onSubmit={handleCreate} className="mt-4 flex flex-wrap gap-3">
+        <form onSubmit={handleCreate} className="mt-4 space-y-3">
+          <div className="space-y-1.5">
+            <FieldLabel htmlFor="table-qr-name" required>
+              Table name
+            </FieldLabel>
+            <div className="flex flex-wrap gap-3">
           <Input
+            id="table-qr-name"
             value={tableName}
             onChange={(e) => setTableName(e.target.value)}
             placeholder="e.g. Table 4, Patio, Bar"
-            className="h-11 flex-1 min-w-[200px] rounded-xl border-neutral-200"
+            className="h-11 flex-1 min-w-[200px] rounded-xl border-border"
           />
           <Button
             type="submit"
             disabled={isPending || !tableName.trim()}
-            className="h-11 rounded-xl bg-neutral-900 px-5 text-white hover:bg-neutral-800"
+            className="h-11 rounded-xl px-5"
           >
             <Plus className="mr-1.5 h-4 w-4" />
             Add Table
           </Button>
+            </div>
+          </div>
+          <FieldError message={error} />
         </form>
 
         {quickSuggestions.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-neutral-400">Quick add:</span>
+            <span className="text-xs text-muted-foreground">Quick add:</span>
             {quickSuggestions.map((s) => (
               <button
                 key={s}
                 type="button"
                 disabled={isPending}
                 onClick={() => handleQuickAdd(s)}
-                className="rounded-full border border-neutral-200 px-3 py-1 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50 disabled:opacity-50"
+                className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 + {s}
               </button>
@@ -118,11 +128,6 @@ export function TableQrManager({
           </div>
         )}
 
-        {error && (
-          <p className="mt-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600">
-            {error}
-          </p>
-        )}
       </div>
 
       {tableQrs.length === 0 ? (
@@ -149,7 +154,7 @@ export function TableQrManager({
                 disabled={isPending}
                 onClick={() => handleDelete(table.id)}
                 aria-label={`Delete ${table.table_name}`}
-                className="absolute right-4 top-4 text-neutral-400 hover:bg-red-50 hover:text-red-600"
+                className="absolute right-4 top-4 text-muted-foreground hover:bg-red-50 hover:text-red-600"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

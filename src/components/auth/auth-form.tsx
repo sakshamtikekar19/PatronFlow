@@ -21,7 +21,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
     <form action={formAction} className="space-y-5">
       {mode === "signup" && (
         <div className="space-y-2">
-          <Label htmlFor="restaurant_name" className="text-neutral-700">
+          <Label htmlFor="restaurant_name" className="text-foreground">
             Restaurant Name
           </Label>
           <Input
@@ -29,13 +29,13 @@ export function AuthForm({ mode, action }: AuthFormProps) {
             name="restaurant_name"
             placeholder="The Golden Fork"
             required
-            className="h-11 rounded-xl border-neutral-200 bg-white"
+            className="h-11 rounded-xl border-border bg-card"
           />
         </div>
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-neutral-700">
+        <Label htmlFor="email" className="text-foreground">
           Email
         </Label>
         <Input
@@ -44,12 +44,12 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           type="email"
           placeholder="you@restaurant.com"
           required
-          className="h-11 rounded-xl border-neutral-200 bg-white"
+          className="h-11 rounded-xl border-border bg-card"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-neutral-700">
+        <Label htmlFor="password" className="text-foreground">
           Password
         </Label>
         <Input
@@ -59,7 +59,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           placeholder="••••••••"
           required
           minLength={6}
-          className="h-11 rounded-xl border-neutral-200 bg-white"
+          className="h-11 rounded-xl border-border bg-card"
         />
       </div>
 
@@ -87,18 +87,18 @@ export function AuthForm({ mode, action }: AuthFormProps) {
             : "Create account"}
       </Button>
 
-      <p className="text-center text-sm text-neutral-500">
+      <p className="text-center text-sm text-muted-foreground">
         {mode === "login" ? (
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-medium text-neutral-900 hover:underline">
+            <Link href="/signup" className="font-medium text-foreground hover:underline">
               Sign up
             </Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-neutral-900 hover:underline">
+            <Link href="/login" className="font-medium text-foreground hover:underline">
               Sign in
             </Link>
           </>
