@@ -447,7 +447,7 @@ export function EventsPageClient({
                           size="sm"
                           render={
                             <Link
-                              href={`/events/${e.id}`}
+                              href={`/events/${e.slug ?? e.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             />
