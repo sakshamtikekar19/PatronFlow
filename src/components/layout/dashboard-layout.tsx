@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { BRAND } from "@/config/branding";
@@ -33,11 +34,15 @@ export function DashboardLayout({
         <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
           {children}
         </main>
-        <footer className="border-t border-neutral-100 px-4 py-6 text-center lg:px-8">
-          <p className="text-sm font-semibold italic text-neutral-700">
-            {BRAND.name}
-          </p>
-          <p className="mt-0.5 text-xs text-neutral-400">{BRAND.tagline}</p>
+        <footer className="flex flex-col items-center border-t border-neutral-100 px-4 py-6 text-center lg:px-8">
+          <Image
+            src="/patronflowlogo.png"
+            alt={BRAND.name}
+            width={1297}
+            height={375}
+            className="h-6 w-auto"
+          />
+          <p className="mt-1.5 text-xs text-neutral-400">{BRAND.tagline}</p>
         </footer>
       </div>
     </div>
