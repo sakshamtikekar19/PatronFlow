@@ -5,6 +5,7 @@ import {
   getLoyaltyStats,
   getLoyaltyRules,
   getLoyaltyCustomers,
+  getLoyaltyTransactions,
 } from "@/lib/queries/loyalty";
 
 export default async function LoyaltyPage() {
@@ -14,10 +15,11 @@ export default async function LoyaltyPage() {
     redirect("/login");
   }
 
-  const [stats, rules, customers] = await Promise.all([
+  const [stats, rules, customers, transactions] = await Promise.all([
     getLoyaltyStats(restaurant.id),
     getLoyaltyRules(restaurant.id),
     getLoyaltyCustomers(restaurant.id),
+    getLoyaltyTransactions(restaurant.id),
   ]);
 
   return (
@@ -30,7 +32,12 @@ export default async function LoyaltyPage() {
           Reward your regulars with points and keep them coming back.
         </p>
       </div>
-      <LoyaltyPageClient stats={stats} rules={rules} customers={customers} />
+      <LoyaltyPageClient
+        stats={stats}
+        rules={rules}
+        customers={customers}
+        transactions={transactions}
+      />
     </div>
   );
 }

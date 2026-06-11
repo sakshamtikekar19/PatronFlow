@@ -4,6 +4,7 @@ import type {
   FeedbackCategory,
   RecoveryStatus,
   Event,
+  LoyaltyTransactionType,
 } from "./database.types";
 
 export type {
@@ -176,6 +177,16 @@ export interface LoyaltyCustomer extends Customer {
   totalPoints: number;
   pointsEarned: number;
   pointsRedeemed: number;
+}
+
+export interface LoyaltyTransactionWithCustomer {
+  id: string;
+  points: number;
+  transaction_type: LoyaltyTransactionType;
+  notes: string | null;
+  created_at: string;
+  customerName: string;
+  customerPhone: string | null;
 }
 
 export interface CustomerLoyaltySummary {

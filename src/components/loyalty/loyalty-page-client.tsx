@@ -1,7 +1,18 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Gift, Plus, Trash2, Star, Coins, Search } from "lucide-react";
+import {
+  Gift,
+  Plus,
+  Trash2,
+  Star,
+  Coins,
+  Search,
+  History,
+  ArrowUpRight,
+  ArrowDownRight,
+  Settings2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +53,7 @@ import type {
   LoyaltyStats,
   LoyaltyCustomer,
   LoyaltyTransactionType,
+  LoyaltyTransactionWithCustomer,
 } from "@/types";
 import { toast } from "sonner";
 
@@ -49,12 +61,22 @@ interface LoyaltyPageClientProps {
   stats: LoyaltyStats;
   rules: LoyaltyRule[];
   customers: LoyaltyCustomer[];
+  transactions: LoyaltyTransactionWithCustomer[];
 }
+
+type HistoryFilter = "all" | LoyaltyTransactionType;
+
+const TXN_DATE_FMT = new Intl.DateTimeFormat("en-IN", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 export function LoyaltyPageClient({
   stats,
   rules,
   customers,
+  transactions,
 }: LoyaltyPageClientProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -69,6 +91,23 @@ export function LoyaltyPageClient({
         (c.phone ?? "").toLowerCase().includes(q)
     );
   }, [customers, search]);
+
+  // History filters
+  const [historyType, setHistoryType] = useState<HistoryFilter>("all");
+  const [historySearch, setHistorySearch] = useState("");
+  const filteredTransactions = useMemo(() => {
+    const q = historySearch.trim().toLowerCase();
+    return transactions.filter((t) => {
+      if (historyType !== "all" && t.transaction_type !== historyType) {
+        return false;
+      }
+      if (!q) return true;
+      return (
+        t.customerName.toLowerCase().includes(q) ||
+        (t.customerPhone ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [transactions, historyType, historySearch]);
 
   // Reward dialog state
   const [rewardOpen, setRewardOpen] = useState(false);
@@ -306,6 +345,127 @@ export function LoyaltyPageClient({
                       </TableCell>
                     </TableRow>
                   ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Points history */}
+      <div>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-neutral-900">
+            Points history
+          </h2>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Select
+              value={historyType}
+              onValueChange={(v) => v && setHistoryType(v as HistoryFilter)}
+            >
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All activity</SelectItem>
+                <SelectItem value="earned">Earned</SelectItem>
+                <SelectItem value="redeemed">Redeemed</SelectItem>
+                <SelectItem value="adjusted">Adjusted</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="relative w-full sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Input
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                placeholder="Search by name or phone"
+                className="pl-9"
+              />
+            </div>
+          </div>
+        </div>
+
+        {transactions.length === 0 ? (
+          <EmptyState
+            icon={<History className="h-6 w-6" />}
+            title="No activity yet"
+            description="Points added or redeemed will show up here as a running log."
+          />
+        ) : filteredTransactions.length === 0 ? (
+          <EmptyState
+            icon={<Search className="h-6 w-6" />}
+            title="No matching activity"
+            description="Try a different filter, name, or phone number."
+          />
+        ) : (
+          <Card className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>Date</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">Notes</TableHead>
+                    <TableHead className="text-right">Points</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((t) => {
+                    const isRedeemed = t.transaction_type === "redeemed";
+                    const isEarned = t.transaction_type === "earned";
+                    return (
+                      <TableRow key={t.id}>
+                        <TableCell className="whitespace-nowrap text-sm text-neutral-600">
+                          {TXN_DATE_FMT.format(new Date(t.created_at))}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium text-neutral-900">
+                            {t.customerName}
+                          </div>
+                          {t.customerPhone && (
+                            <div className="text-xs text-neutral-500">
+                              {t.customerPhone}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className={
+                              isRedeemed
+                                ? "border-0 bg-rose-50 text-rose-700"
+                                : isEarned
+                                ? "border-0 bg-emerald-50 text-emerald-700"
+                                : "border-0 bg-neutral-100 text-neutral-700"
+                            }
+                          >
+                            {isRedeemed ? (
+                              <ArrowDownRight className="h-3 w-3" />
+                            ) : isEarned ? (
+                              <ArrowUpRight className="h-3 w-3" />
+                            ) : (
+                              <Settings2 className="h-3 w-3" />
+                            )}
+                            <span className="capitalize">
+                              {t.transaction_type}
+                            </span>
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell text-sm text-neutral-600">
+                          {t.notes ?? "—"}
+                        </TableCell>
+                        <TableCell
+                          className={`text-right font-medium ${
+                            isRedeemed ? "text-rose-600" : "text-emerald-600"
+                          }`}
+                        >
+                          {isRedeemed ? "−" : "+"}
+                          {t.points}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>

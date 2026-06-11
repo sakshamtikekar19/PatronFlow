@@ -5,6 +5,7 @@ import type {
   LoyaltyCustomer,
   CustomerLoyaltySummary,
   Customer,
+  LoyaltyTransactionWithCustomer,
 } from "@/types";
 
 interface PointTotals {
@@ -80,6 +81,37 @@ export async function getLoyaltyStats(
     outstandingPoints,
     rewardCount: rules.length,
   };
+}
+
+export async function getLoyaltyTransactions(
+  restaurantId: string,
+  limit = 300
+): Promise<LoyaltyTransactionWithCustomer[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("loyalty_transactions")
+    .select("id, points, transaction_type, notes, created_at, customers(name, phone)")
+    .eq("restaurant_id", restaurantId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  return (data ?? []).map((t) => {
+    const raw = t.customers as
+      | { name: string; phone: string | null }
+      | { name: string; phone: string | null }[]
+      | null;
+    const customer = Array.isArray(raw) ? raw[0] : raw;
+    return {
+      id: t.id,
+      points: t.points,
+      transaction_type: t.transaction_type,
+      notes: t.notes,
+      created_at: t.created_at,
+      customerName: customer?.name ?? "Unknown",
+      customerPhone: customer?.phone ?? null,
+    };
+  });
 }
 
 export async function getLoyaltyCustomers(
