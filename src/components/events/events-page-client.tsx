@@ -130,7 +130,13 @@ export function EventsPageClient({
       if (res.coverUrl) {
         setCoverImage(res.coverUrl);
         toast.success("Image uploaded");
+      } else {
+        toast.error("Upload did not return an image. Please try again.");
       }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Image upload failed. Please try again."
+      );
     } finally {
       setIsUploadingCover(false);
     }
@@ -267,6 +273,18 @@ export function EventsPageClient({
                 key={e.id}
                 className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden"
               >
+                {e.cover_image && (
+                  <div className="aspect-[16/6] w-full overflow-hidden bg-neutral-100">
+                    <Image
+                      src={e.cover_image}
+                      alt={e.title}
+                      width={800}
+                      height={300}
+                      unoptimized
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
