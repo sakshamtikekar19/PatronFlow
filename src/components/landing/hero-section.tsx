@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, TrendingUp, Users } from "lucide-react";
-import { HERO } from "@/config/landing";
+import { HERO, HERO_IMAGE } from "@/config/landing";
 import { WhatsAppCta } from "./whatsapp-cta";
 
 const container = {
@@ -79,20 +80,22 @@ export function HeroSection() {
           className="relative"
         >
           <div className="relative rounded-3xl bg-gradient-to-br from-amber-300/60 via-neutral-200/50 to-orange-200/60 p-[1.5px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)]">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white">
+            <div className="relative overflow-hidden rounded-3xl bg-white">
               {/* Faux dashboard chrome */}
               <div className="flex items-center gap-1.5 border-b border-neutral-100 bg-neutral-50/80 px-4 py-3">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
               </div>
-              <div className="flex h-full flex-col items-center justify-center gap-3 px-6 pb-10 text-center">
-                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
-                  Dashboard Preview
-                </span>
-                <span className="rounded-xl border border-dashed border-neutral-300 px-5 py-3 text-sm font-medium text-neutral-400">
-                  [ INSERT DASHBOARD SCREENSHOT HERE ]
-                </span>
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src={HERO_IMAGE}
+                  alt="PatronFlow dashboard"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover object-top"
+                />
               </div>
             </div>
           </div>

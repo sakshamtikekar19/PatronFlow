@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { SHOWCASE } from "@/config/landing";
 import { SectionHeading } from "./section-heading";
@@ -45,10 +46,14 @@ export function DashboardShowcase() {
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/60" />
                   </div>
                 </div>
-                <div className="flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-neutral-50 to-white p-6">
-                  <span className="rounded-xl border border-dashed border-neutral-300 px-5 py-3 text-center text-sm font-medium text-neutral-400 transition-colors group-hover:border-neutral-400">
-                    {card.placeholder}
-                  </span>
+                <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-neutral-50 to-white">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
                 </div>
               </div>
             </motion.div>

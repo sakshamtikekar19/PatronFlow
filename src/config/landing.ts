@@ -112,25 +112,27 @@ export const FEATURES: Feature[] = [
 export const SHOWCASE = [
   {
     title: "Analytics Dashboard",
-    placeholder: "[ INSERT ANALYTICS SCREENSHOT ]",
+    image: "/landing/analytics.png",
     icon: "chart",
   },
   {
     title: "Customer CRM",
-    placeholder: "[ INSERT CRM SCREENSHOT ]",
+    image: "/landing/customers.png",
     icon: "users",
   },
   {
     title: "Feedback Management",
-    placeholder: "[ INSERT FEEDBACK SCREENSHOT ]",
+    image: "/landing/feedback.png",
     icon: "message",
   },
   {
     title: "Loyalty & Events",
-    placeholder: "[ INSERT LOYALTY SCREENSHOT ]",
+    image: "/landing/loyalty.png",
     icon: "gift",
   },
 ] as const;
+
+export const HERO_IMAGE = "/landing/dashboard.png";
 
 export const ADVANTAGES_WITH = [
   "More Google Reviews",
