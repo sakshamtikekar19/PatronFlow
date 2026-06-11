@@ -7,6 +7,10 @@ const feedbackSchema = z.object({
   restaurantId: z.string().uuid(),
   name: z.string().min(1, "Name is required"),
   phone: z.string().min(1, "Phone is required"),
+  birthday: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Birthday must be a valid date")
+    .optional(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
   category: z
@@ -29,7 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { restaurantId, name, phone, rating, comment, category, tableName, source } =
+    const { restaurantId, name, phone, birthday, rating, comment, category, tableName, source } =
       parsed.data;
 
     const supabase = createAdminClient();
@@ -60,7 +64,7 @@ export async function POST(request: Request) {
       customerId = existingCustomer.id;
       await supabase
         .from("customers")
-        .update({ name })
+        .update({ name, ...(birthday ? { birthday } : {}) })
         .eq("id", customerId);
     } else {
       const { data: newCustomer, error: customerError } = await supabase
@@ -69,6 +73,7 @@ export async function POST(request: Request) {
           restaurant_id: restaurantId,
           name,
           phone,
+          birthday: birthday ?? null,
         })
         .select("id")
         .single();

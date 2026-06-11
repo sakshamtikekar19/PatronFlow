@@ -98,7 +98,8 @@ export interface RestaurantInsights {
 export type NotificationType =
   | "negative_feedback"
   | "new_customer"
-  | "vip";
+  | "vip"
+  | "birthday";
 
 export interface NotificationItem {
   id: string;

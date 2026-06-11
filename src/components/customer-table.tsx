@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { RatingStars } from "@/components/rating-stars";
 import { SegmentBadge } from "@/components/customers/segment-badge";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatBirthday } from "@/lib/utils";
 import type { SegmentedCustomer } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,7 @@ export function CustomerTable({
               <TableHead className="text-neutral-500 font-medium">Name</TableHead>
               <TableHead className="text-neutral-500 font-medium">Phone</TableHead>
               <TableHead className="text-neutral-500 font-medium">Email</TableHead>
+              <TableHead className="text-neutral-500 font-medium">Birthday</TableHead>
               <TableHead className="text-neutral-500 font-medium text-center">Visits</TableHead>
               <TableHead className="text-neutral-500 font-medium">Avg Rating</TableHead>
               <TableHead className="text-neutral-500 font-medium">Segment</TableHead>
@@ -54,6 +55,9 @@ export function CustomerTable({
                 <TableCell className="text-neutral-600">{customer.phone}</TableCell>
                 <TableCell className="text-neutral-600">
                   {customer.email ?? "—"}
+                </TableCell>
+                <TableCell className="text-neutral-600">
+                  {formatBirthday(customer.birthday)}
                 </TableCell>
                 <TableCell className="text-center text-neutral-600">
                   {customer.visits}
@@ -98,8 +102,11 @@ export function CustomerTable({
               </div>
               <SegmentBadge segment={customer.segment} />
             </div>
-            <div className="mt-3 flex gap-4 text-xs text-neutral-500">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
               <span>{customer.visits} visits</span>
+              {customer.birthday && (
+                <span>🎂 {formatBirthday(customer.birthday)}</span>
+              )}
               {customer.last_visit && (
                 <span>Last: {formatDate(customer.last_visit)}</span>
               )}

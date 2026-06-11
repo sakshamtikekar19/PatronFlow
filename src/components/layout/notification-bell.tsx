@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, AlertTriangle, UserPlus, Crown } from "lucide-react";
+import { Bell, AlertTriangle, UserPlus, Crown, Cake } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu,
@@ -17,12 +17,14 @@ const ICONS: Record<NotificationType, React.ReactNode> = {
   negative_feedback: <AlertTriangle className="h-4 w-4 text-red-600" />,
   new_customer: <UserPlus className="h-4 w-4 text-blue-600" />,
   vip: <Crown className="h-4 w-4 text-amber-600" />,
+  birthday: <Cake className="h-4 w-4 text-pink-600" />,
 };
 
 const ICON_BG: Record<NotificationType, string> = {
   negative_feedback: "bg-red-50",
   new_customer: "bg-blue-50",
   vip: "bg-amber-50",
+  birthday: "bg-pink-50",
 };
 
 export function NotificationBell() {

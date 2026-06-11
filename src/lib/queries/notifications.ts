@@ -62,6 +62,36 @@ export async function getNotifications(
     });
   });
 
+  // Birthdays today: match on month + day regardless of birth year.
+  const { data: birthdayCustomers } = await supabase
+    .from("customers")
+    .select("id, name, birthday")
+    .eq("restaurant_id", restaurantId)
+    .not("birthday", "is", null);
+
+  const today = new Date();
+  const todayMonth = today.getMonth();
+  const todayDate = today.getDate();
+  const startOfToday = new Date(
+    today.getFullYear(),
+    todayMonth,
+    todayDate
+  ).toISOString();
+
+  (birthdayCustomers ?? []).forEach((c) => {
+    if (!c.birthday) return;
+    const [, m, d] = c.birthday.split("-").map(Number);
+    if (m - 1 === todayMonth && d === todayDate) {
+      items.push({
+        id: `bday-${c.id}`,
+        type: "birthday",
+        title: "Customer birthday today 🎂",
+        description: `It's ${c.name}'s birthday today — reach out!`,
+        createdAt: startOfToday,
+      });
+    }
+  });
+
   // VIP identified (5+ visits, last visit within lookback)
   const customersWithStats = await getCustomersWithStats(restaurantId);
   customersWithStats

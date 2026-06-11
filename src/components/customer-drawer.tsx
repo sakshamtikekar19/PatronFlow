@@ -11,7 +11,7 @@ import { RatingStars } from "@/components/rating-stars";
 import { StatusBadge } from "@/components/status-badge";
 import { SegmentBadge } from "@/components/customers/segment-badge";
 import { ExternalLink, Gift } from "lucide-react";
-import { formatDate, formatDateTime } from "@/lib/utils";
+import { formatDate, formatDateTime, formatBirthday } from "@/lib/utils";
 import type {
   SegmentedCustomer,
   FeedbackWithCustomer,
@@ -56,6 +56,12 @@ export function CustomerDrawer({
                 <span className="text-neutral-500">Email</span>
                 <span className="font-medium text-neutral-900">
                   {customer.email ?? "—"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-500">Birthday</span>
+                <span className="font-medium text-neutral-900">
+                  {formatBirthday(customer.birthday)}
                 </span>
               </div>
               <div className="flex justify-between">

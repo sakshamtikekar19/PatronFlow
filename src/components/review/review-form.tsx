@@ -35,7 +35,9 @@ export function ReviewForm({
 }: ReviewFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [birthday, setBirthday] = useState("");
   const [rating, setRating] = useState(0);
+  const todayStr = new Date().toISOString().slice(0, 10);
   const [comment, setComment] = useState("");
   const [category, setCategory] = useState<FeedbackCategory>("Other");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +48,7 @@ export function ReviewForm({
     e.preventDefault();
     setError(null);
 
-    if (!name || !phone || rating === 0) {
+    if (!name || !phone || !birthday || rating === 0) {
       setError("Please fill in all required fields and select a rating.");
       return;
     }
@@ -61,6 +63,7 @@ export function ReviewForm({
           restaurantId,
           name,
           phone,
+          birthday,
           rating,
           comment: comment || undefined,
           category,
@@ -183,6 +186,22 @@ export function ReviewForm({
           required
           className="h-12 rounded-xl border-neutral-200 bg-white"
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="birthday">Birthday *</Label>
+        <Input
+          id="birthday"
+          type="date"
+          value={birthday}
+          onChange={(e) => setBirthday(e.target.value)}
+          max={todayStr}
+          required
+          className="h-12 rounded-xl border-neutral-200 bg-white"
+        />
+        <p className="text-xs text-neutral-400">
+          We&apos;ll surprise you with something special on your day.
+        </p>
       </div>
 
       <div className="space-y-3">
