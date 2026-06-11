@@ -58,6 +58,7 @@ export function RecoveryPageClient({
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [notesCase, setNotesCase] = useState<RecoveryCase | null>(null);
   const [notesValue, setNotesValue] = useState("");
+  const [commentCase, setCommentCase] = useState<RecoveryCase | null>(null);
 
   const setStatus = (id: string, status: RecoveryStatus) => {
     setPendingId(id);
@@ -152,9 +153,18 @@ export function RecoveryPageClient({
                       </span>
                     </TableCell>
                     <TableCell className="hidden xl:table-cell max-w-[220px]">
-                      <span className="line-clamp-2 text-neutral-600">
-                        {c.comment || "—"}
-                      </span>
+                      {c.comment ? (
+                        <button
+                          type="button"
+                          onClick={() => setCommentCase(c)}
+                          title="Click to read full comment"
+                          className="line-clamp-2 text-left text-neutral-600 hover:text-neutral-900 hover:underline"
+                        >
+                          {c.comment}
+                        </button>
+                      ) : (
+                        <span className="text-neutral-600">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-neutral-500">
                       {formatDate(c.created_at)}
@@ -233,6 +243,36 @@ export function RecoveryPageClient({
             </Button>
             <Button onClick={saveNotes} disabled={isPending}>
               {isPending ? "Saving..." : "Save notes"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={commentCase !== null}
+        onOpenChange={(open) => !open && setCommentCase(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {commentCase?.customer?.name ?? "Guest"} feedback
+            </DialogTitle>
+            <DialogDescription>
+              {commentCase ? formatDate(commentCase.created_at) : ""}
+              {commentCase?.category ? ` · ${commentCase.category}` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {commentCase && (
+            <div className="space-y-4">
+              <RatingStars rating={commentCase.rating} size="sm" />
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">
+                {commentCase.comment}
+              </p>
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setCommentCase(null)}>
+              Close
             </Button>
           </div>
         </DialogContent>
