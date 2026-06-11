@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Gift, Plus, Trash2, Star, Coins } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
+import { Gift, Plus, Trash2, Star, Coins, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,6 +57,18 @@ export function LoyaltyPageClient({
   customers,
 }: LoyaltyPageClientProps) {
   const [isPending, startTransition] = useTransition();
+
+  // Member search
+  const [search, setSearch] = useState("");
+  const filteredCustomers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return customers;
+    return customers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.phone ?? "").toLowerCase().includes(q)
+    );
+  }, [customers, search]);
 
   // Reward dialog state
   const [rewardOpen, setRewardOpen] = useState(false);
@@ -206,12 +218,31 @@ export function LoyaltyPageClient({
 
       {/* Members */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-neutral-900">Members</h2>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-neutral-900">Members</h2>
+          {customers.length > 0 && (
+            <div className="relative w-full sm:w-72">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name or phone"
+                className="pl-9"
+              />
+            </div>
+          )}
+        </div>
         {customers.length === 0 ? (
           <EmptyState
             icon={<Star className="h-6 w-6" />}
             title="No customers yet"
             description="Once guests leave feedback they'll appear here and you can start awarding loyalty points."
+          />
+        ) : filteredCustomers.length === 0 ? (
+          <EmptyState
+            icon={<Search className="h-6 w-6" />}
+            title="No matches"
+            description={`No members match "${search}". Try a different name or phone number.`}
           />
         ) : (
           <Card className="border-0 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] rounded-2xl">
@@ -231,7 +262,7 @@ export function LoyaltyPageClient({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {customers.map((c) => (
+                  {filteredCustomers.map((c) => (
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="font-medium text-neutral-900">
