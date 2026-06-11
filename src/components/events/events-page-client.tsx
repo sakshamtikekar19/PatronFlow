@@ -81,6 +81,12 @@ function toDateInput(value: string | null): string {
   )}:${pad(d.getMinutes())}`;
 }
 
+// Current local time formatted for a datetime-local `min` attribute, so guests
+// can't pick a date/time in the past for an event.
+function nowDateInput(): string {
+  return toDateInput(new Date().toISOString());
+}
+
 interface EventsPageClientProps {
   events: EventWithStats[];
   analytics: EventAnalytics;
@@ -98,6 +104,7 @@ export function EventsPageClient({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [originalEventDate, setOriginalEventDate] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -165,20 +172,34 @@ export function EventsPageClient({
     setTitle("");
     setDescription("");
     setEventDate("");
+    setOriginalEventDate("");
     setCoverImage("");
     setFormOpen(true);
   };
 
   const openEdit = (e: EventWithStats) => {
+    const existingDate = toDateInput(e.event_date);
     setEditingId(e.id);
     setTitle(e.title);
     setDescription(e.description ?? "");
-    setEventDate(toDateInput(e.event_date));
+    setEventDate(existingDate);
+    setOriginalEventDate(existingDate);
     setCoverImage(e.cover_image ?? "");
     setFormOpen(true);
   };
 
   const submitForm = () => {
+    // Block past dates only when the date is newly set/changed, so editing
+    // other fields on an already-past (e.g. completed) event still works.
+    const dateChanged = eventDate !== originalEventDate;
+    if (
+      eventDate &&
+      dateChanged &&
+      new Date(eventDate).getTime() < Date.now()
+    ) {
+      toast.error("Event date and time can't be in the past.");
+      return;
+    }
     startTransition(async () => {
       const payload = {
         title,
@@ -474,6 +495,7 @@ export function EventsPageClient({
                 id="event-date"
                 type="datetime-local"
                 value={eventDate}
+                min={nowDateInput()}
                 onChange={(e) => setEventDate(e.target.value)}
               />
             </div>
