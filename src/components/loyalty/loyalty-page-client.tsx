@@ -12,7 +12,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Settings2,
+  Users,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,6 +81,9 @@ export function LoyaltyPageClient({
   transactions,
 }: LoyaltyPageClientProps) {
   const [isPending, startTransition] = useTransition();
+
+  // Top-level view: Members vs Points
+  const [view, setView] = useState<"members" | "points">("members");
 
   // Member search
   const [search, setSearch] = useState("");
@@ -190,7 +195,33 @@ export function LoyaltyPageClient({
         <StatCard title="Active Rewards" value={stats.rewardCount} icon="🏆" />
       </div>
 
-      {/* Rewards management */}
+      {/* View switcher */}
+      <div className="inline-flex gap-1 rounded-xl bg-neutral-100 p-1">
+        {(
+          [
+            { id: "members", label: "Members", icon: Users },
+            { id: "points", label: "Points", icon: Coins },
+          ] as const
+        ).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setView(id)}
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              view === id
+                ? "bg-white text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                : "text-neutral-500 hover:text-neutral-900"
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Rewards management — Points view */}
+      {view === "points" && (
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-neutral-900">Rewards</h2>
@@ -254,8 +285,10 @@ export function LoyaltyPageClient({
           </div>
         )}
       </div>
+      )}
 
-      {/* Members */}
+      {/* Members view */}
+      {view === "members" && (
       <div>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-neutral-900">Members</h2>
@@ -351,8 +384,10 @@ export function LoyaltyPageClient({
           </Card>
         )}
       </div>
+      )}
 
-      {/* Points history */}
+      {/* Points history — Points view */}
+      {view === "points" && (
       <div>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-neutral-900">
@@ -472,6 +507,7 @@ export function LoyaltyPageClient({
           </Card>
         )}
       </div>
+      )}
 
       {/* Create reward dialog */}
       <Dialog open={rewardOpen} onOpenChange={setRewardOpen}>
