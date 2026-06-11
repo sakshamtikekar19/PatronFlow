@@ -64,11 +64,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = user ? "/dashboard" : "/login";
-    return NextResponse.redirect(url);
-  }
+  // "/" is the public marketing landing page — accessible to everyone.
 
   if (!user && !isAuthRoute && !isPublicRoute && pathname !== "/") {
     const url = request.nextUrl.clone();
