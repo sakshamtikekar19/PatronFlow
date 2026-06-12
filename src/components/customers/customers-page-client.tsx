@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Users, Trash2, X } from "lucide-react";
+import { Users, Trash2, X, Gift, MessageCircle, Cake } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
 import { CustomerTable } from "@/components/customer-table";
 import { CustomerDrawer } from "@/components/customer-drawer";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FieldLabel } from "@/components/form-label";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +21,8 @@ import {
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { SEGMENT_ORDER, SEGMENT_DESCRIPTIONS } from "@/lib/segments";
 import { deleteCustomers } from "@/lib/actions/customers";
-import { cn } from "@/lib/utils";
+import { addLoyaltyTransaction } from "@/lib/actions/loyalty";
+import { cn, isBirthdayToday, whatsappLink } from "@/lib/utils";
 import { toast } from "sonner";
 import type {
   SegmentedCustomer,
@@ -56,6 +60,13 @@ export function CustomersPageClient({
   );
   const [isDeleting, startDeleting] = useTransition();
 
+  // Add-loyalty-points dialog state
+  const [pointsCustomer, setPointsCustomer] =
+    useState<SegmentedCustomer | null>(null);
+  const [pointsAmount, setPointsAmount] = useState("");
+  const [pointsNotes, setPointsNotes] = useState("");
+  const [isAddingPoints, startAddingPoints] = useTransition();
+
   // Keep local state in sync if server data changes (e.g. after revalidation).
   useEffect(() => {
     setCustomers(initialCustomers);
@@ -75,15 +86,30 @@ export function CustomersPageClient({
       : customers.filter((c) => c.segment === activeSegment);
 
   const filteredCustomers = useMemo(() => {
-    if (!debouncedSearch) return bySegment;
-    const q = debouncedSearch.toLowerCase();
-    return bySegment.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.phone.includes(debouncedSearch) ||
-        c.email?.toLowerCase().includes(q)
-    );
+    const base = !debouncedSearch
+      ? bySegment
+      : bySegment.filter((c) => {
+          const q = debouncedSearch.toLowerCase();
+          return (
+            c.name.toLowerCase().includes(q) ||
+            c.phone.includes(debouncedSearch) ||
+            c.email?.toLowerCase().includes(q)
+          );
+        });
+
+    // Float customers whose birthday is today to the top so the owner can
+    // greet them and reward them right away.
+    return [...base].sort((a, b) => {
+      const aBday = isBirthdayToday(a.birthday) ? 1 : 0;
+      const bBday = isBirthdayToday(b.birthday) ? 1 : 0;
+      return bBday - aBday;
+    });
   }, [bySegment, debouncedSearch]);
+
+  const birthdayCustomers = useMemo(
+    () => customers.filter((c) => isBirthdayToday(c.birthday)),
+    [customers]
+  );
 
   const handleCustomerClick = async (customer: SegmentedCustomer) => {
     setSelectedCustomer(customer);
@@ -127,6 +153,37 @@ export function CustomersPageClient({
     () => customers.filter((c) => selectedIds.has(c.id)),
     [customers, selectedIds]
   );
+
+  const openAddPoints = (customer: SegmentedCustomer) => {
+    setPointsCustomer(customer);
+    setPointsAmount("");
+    setPointsNotes(
+      isBirthdayToday(customer.birthday) ? "Birthday reward 🎉" : ""
+    );
+  };
+
+  const submitPoints = () => {
+    if (!pointsCustomer) return;
+    const amount = Number(pointsAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error("Enter a points amount greater than 0");
+      return;
+    }
+    startAddingPoints(async () => {
+      const res = await addLoyaltyTransaction({
+        customerId: pointsCustomer.id,
+        points: amount,
+        type: "earned",
+        notes: pointsNotes,
+      });
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`Added ${amount} points to ${pointsCustomer.name}`);
+      setPointsCustomer(null);
+    });
+  };
 
   const confirmDelete = () => {
     if (!pendingDelete || pendingDelete.length === 0) return;
@@ -202,6 +259,69 @@ export function CustomersPageClient({
         )}
       </div>
 
+      {/* Birthdays today */}
+      {birthdayCustomers.length > 0 && (
+        <div className="rounded-2xl border border-pink-200 bg-pink-50/60 p-4 dark:border-pink-900/40 dark:bg-pink-950/20">
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 text-pink-600 dark:bg-pink-900/40">
+              <Cake className="h-4 w-4" />
+            </span>
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">
+                Birthdays today
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Greet them and add a loyalty reward to make their day.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {birthdayCustomers.map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-col gap-3 rounded-xl bg-card p-3 shadow-card"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleCustomerClick(c)}
+                  className="text-left"
+                >
+                  <p className="font-medium text-foreground">{c.name}</p>
+                  <p className="text-xs text-muted-foreground">{c.phone}</p>
+                </button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAddPoints(c)}
+                  >
+                    <Gift className="h-3.5 w-3.5" />
+                    Add points
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    render={
+                      <a
+                        href={whatsappLink(
+                          c.phone,
+                          `Happy birthday, ${c.name}! 🎉`
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    }
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Contact
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Bulk selection toolbar */}
       {selectedIds.size > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-card">
@@ -259,6 +379,62 @@ export function CustomersPageClient({
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
       />
+
+      {/* Add loyalty points */}
+      <Dialog
+        open={pointsCustomer !== null}
+        onOpenChange={(open) =>
+          !open && !isAddingPoints && setPointsCustomer(null)
+        }
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add loyalty points</DialogTitle>
+            <DialogDescription>
+              Reward {pointsCustomer?.name} with loyalty points.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <FieldLabel htmlFor="cust-points" required>
+                Points
+              </FieldLabel>
+              <Input
+                id="cust-points"
+                type="number"
+                min={1}
+                value={pointsAmount}
+                onChange={(e) => setPointsAmount(e.target.value)}
+                placeholder="50"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <FieldLabel htmlFor="cust-points-notes" optional>
+                Notes
+              </FieldLabel>
+              <Textarea
+                id="cust-points-notes"
+                value={pointsNotes}
+                onChange={(e) => setPointsNotes(e.target.value)}
+                placeholder="Birthday reward 🎉"
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPointsCustomer(null)}
+              disabled={isAddingPoints}
+            >
+              Cancel
+            </Button>
+            <Button onClick={submitPoints} disabled={isAddingPoints}>
+              {isAddingPoints ? "Adding..." : "Add points"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirmation */}
       <Dialog

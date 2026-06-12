@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RatingStars } from "@/components/rating-stars";
 import { SegmentBadge } from "@/components/customers/segment-badge";
-import { formatDate, formatBirthday } from "@/lib/utils";
+import { formatDate, formatBirthday, isBirthdayToday } from "@/lib/utils";
 import type { SegmentedCustomer } from "@/types";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
@@ -89,7 +89,18 @@ export function CustomerTable({
                     />
                   </TableCell>
                   <TableCell className="font-medium text-foreground">
-                    {customer.name}
+                    <span className="flex items-center gap-1.5">
+                      {customer.name}
+                      {isBirthdayToday(customer.birthday) && (
+                        <span
+                          title="Birthday today"
+                          aria-label="Birthday today"
+                          className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2 py-0.5 text-xs font-medium text-pink-600"
+                        >
+                          🎂 Today
+                        </span>
+                      )}
+                    </span>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{customer.phone}</TableCell>
                   <TableCell className="text-muted-foreground">
@@ -160,7 +171,17 @@ export function CustomerTable({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-medium text-foreground">{customer.name}</p>
+                    <p className="flex items-center gap-1.5 font-medium text-foreground">
+                      {customer.name}
+                      {isBirthdayToday(customer.birthday) && (
+                        <span
+                          aria-label="Birthday today"
+                          className="inline-flex items-center rounded-full bg-pink-50 px-2 py-0.5 text-xs font-medium text-pink-600"
+                        >
+                          🎂
+                        </span>
+                      )}
+                    </p>
                     <p className="text-sm text-muted-foreground">{customer.phone}</p>
                   </div>
                   <SegmentBadge segment={customer.segment} />
