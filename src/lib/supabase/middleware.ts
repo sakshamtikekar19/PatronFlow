@@ -42,6 +42,15 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Webhooks and cron must bypass session checks (no cookies, no redirects).
+  if (
+    pathname.startsWith("/api/webhooks/") ||
+    pathname.startsWith("/api/cron/") ||
+    pathname === "/api/health"
+  ) {
+    return NextResponse.next({ request });
+  }
+
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/signup");
   const isPublicRoute =

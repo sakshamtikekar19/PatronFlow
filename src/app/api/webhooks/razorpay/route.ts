@@ -10,6 +10,12 @@ import {
  * Razorpay Webhook Handler
  * Handles subscription and payment events from Razorpay.
  */
+
+/** Razorpay may probe the URL with GET when validating the webhook. */
+export async function GET() {
+  return NextResponse.json({ status: "ok" });
+}
+
 export async function POST(request: Request) {
   const body = await request.text();
   const signature = request.headers.get("x-razorpay-signature");
