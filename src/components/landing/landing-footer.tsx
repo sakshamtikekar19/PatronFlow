@@ -10,7 +10,11 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 const FOOTER_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Contact", href: "#contact" },
+];
+
+const LEGAL_LINKS = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
 ];
 
 export function LandingFooter() {
@@ -50,6 +54,24 @@ export function LandingFooter() {
 
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                Legal
+              </h4>
+              <ul className="mt-4 space-y-3">
+                {LEGAL_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-neutral-600 transition-colors hover:text-neutral-900"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 WhatsApp
               </h4>
               <a
@@ -69,7 +91,14 @@ export function LandingFooter() {
           <p className="text-xs text-neutral-400">
             © {new Date().getFullYear()} {BRAND.name}. {BRAND.category}.
           </p>
-          <p className="text-xs text-neutral-400">{BRAND.tagline}</p>
+          <nav className="flex items-center gap-4 text-xs text-neutral-400">
+            <Link href="/privacy" className="hover:text-neutral-700">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-neutral-700">
+              Terms of Service
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>

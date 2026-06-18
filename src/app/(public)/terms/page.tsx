@@ -112,7 +112,7 @@ export default function TermsOfServicePage() {
       <h2>6. Cancellation and Refunds</h2>
       <h3>6.1 Cancellation</h3>
       <p>
-        You may cancel your subscription at any time through the billing page or by contacting support.
+        You may cancel your subscription at any time through the billing page.
         Cancellation takes effect at the end of your current billing period.
       </p>
 
@@ -261,15 +261,6 @@ export default function TermsOfServicePage() {
         If any provision of these Terms is found to be unenforceable, the remaining provisions will
         continue in full force and effect.
       </p>
-
-      <h2>19. Contact Information</h2>
-      <p>
-        For questions about these Terms, please contact us at:
-      </p>
-      <ul>
-        <li>Email: legal@patronflow.com</li>
-        <li>Address: [Your Business Address]</li>
-      </ul>
     </article>
   );
 }

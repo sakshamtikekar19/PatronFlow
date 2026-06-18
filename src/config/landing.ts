@@ -14,7 +14,6 @@ export const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Contact", href: "#contact" },
 ] as const;
 
 export const HERO = {

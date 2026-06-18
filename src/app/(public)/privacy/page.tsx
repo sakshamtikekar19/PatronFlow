@@ -133,8 +133,8 @@ export default function PrivacyPolicyPage() {
       <h2>7. Children&apos;s Privacy</h2>
       <p>
         Our Service is not intended for individuals under 18 years of age. We do not knowingly collect
-        personal information from children. If you become aware that a child has provided us with personal
-        information, please contact us.
+        personal information from children. If we become aware that a child has provided us with
+        personal information, we will take steps to delete such information.
       </p>
 
       <h2>8. International Data Transfers</h2>
@@ -156,20 +156,6 @@ export default function PrivacyPolicyPage() {
         We may update this Privacy Policy from time to time. We will notify you of any changes by posting
         the new Privacy Policy on this page and updating the &ldquo;Last updated&rdquo; date. You are advised
         to review this Privacy Policy periodically.
-      </p>
-
-      <h2>11. Contact Us</h2>
-      <p>
-        If you have questions about this Privacy Policy or wish to exercise your rights, please contact us at:
-      </p>
-      <ul>
-        <li>Email: privacy@patronflow.com</li>
-        <li>Address: [Your Business Address]</li>
-      </ul>
-
-      <h2>12. Data Protection Officer</h2>
-      <p>
-        For privacy-related inquiries, you may contact our Data Protection Officer at: dpo@patronflow.com
       </p>
     </article>
   );

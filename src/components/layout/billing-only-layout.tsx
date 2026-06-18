@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,6 +51,17 @@ export function BillingOnlyLayout({
         </DropdownMenu>
       </header>
       <main className="mx-auto w-full max-w-6xl p-4 lg:p-8">{children}</main>
+      <footer className="flex flex-col items-center gap-2 border-t border-border px-4 py-6 text-center">
+        <nav className="flex items-center gap-3 text-xs text-muted-foreground">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+          <span aria-hidden>·</span>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms of Service
+          </Link>
+        </nav>
+      </footer>
     </div>
   );
 }

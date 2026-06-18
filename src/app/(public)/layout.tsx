@@ -44,8 +44,16 @@ export default function PublicLayout({
       </header>
       <main className="mx-auto max-w-4xl px-4 py-12">{children}</main>
       <footer className="border-t border-neutral-200 bg-white">
-        <div className="mx-auto max-w-4xl px-4 py-6 text-center text-sm text-neutral-500">
-          © {new Date().getFullYear()} {BRAND.name}. All rights reserved.
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-2 px-4 py-6 text-center text-sm text-neutral-500 sm:flex-row sm:justify-between">
+          <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
+          <nav className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-neutral-900">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-neutral-900">
+              Terms of Service
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>

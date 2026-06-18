@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { BRAND } from "@/config/branding";
@@ -34,7 +35,7 @@ export function DashboardLayout({
         <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
           {children}
         </main>
-        <footer className="flex flex-col items-center border-t border-border px-4 py-6 text-center lg:px-8">
+        <footer className="flex flex-col items-center gap-2 border-t border-border px-4 py-6 text-center lg:px-8">
           <Image
             src="/patronflowlogo.png"
             alt={BRAND.name}
@@ -42,7 +43,16 @@ export function DashboardLayout({
             height={375}
             className="h-6 w-auto"
           />
-          <p className="mt-1.5 text-xs text-muted-foreground">{BRAND.tagline}</p>
+          <p className="text-xs text-muted-foreground">{BRAND.tagline}</p>
+          <nav className="flex items-center gap-3 text-xs text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy Policy
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms of Service
+            </Link>
+          </nav>
         </footer>
       </div>
     </div>
