@@ -15,7 +15,6 @@ interface SubscriptionStatusProps {
 export function SubscriptionStatus({
   status,
   trialDaysRemaining,
-  currentPeriodEnd,
   cancelAtPeriodEnd,
 }: SubscriptionStatusProps) {
   const getStatusConfig = () => {

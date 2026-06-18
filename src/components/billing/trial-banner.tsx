@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Clock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatTrialDaysRemaining, isTrialEndingSoon } from "@/lib/billing/trial";
+import { formatTrialDaysRemaining } from "@/lib/billing/trial";
 
 interface TrialBannerProps {
   daysRemaining: number;

@@ -1,6 +1,5 @@
 import { getStripeClient } from "./client";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Restaurant, Subscription } from "@/types/database.types";
 
 interface CreateCheckoutSessionParams {
   restaurantId: string;

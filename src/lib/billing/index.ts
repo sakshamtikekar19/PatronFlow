@@ -9,7 +9,7 @@ import { isRazorpayConfigured } from "@/lib/razorpay/client";
 import { createCheckoutSession, createPortalSession } from "@/lib/stripe/checkout";
 import { createRazorpaySubscription, cancelRazorpaySubscription } from "@/lib/razorpay/subscription";
 import type { Subscription, SubscriptionStatus, PaymentProvider } from "@/types/database.types";
-import { BILLING_CONFIG, isInGracePeriod } from "./config";
+import { isInGracePeriod } from "./config";
 
 export type BillingProvider = "stripe" | "razorpay" | "paypal";
 

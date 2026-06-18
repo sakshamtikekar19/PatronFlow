@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { BRAND } from "@/config/branding";
 
 export const metadata: Metadata = { title: "Reset Password" };
 

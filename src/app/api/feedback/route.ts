@@ -7,7 +7,6 @@ import {
   getClientIp,
   rateLimiters,
   rateLimitExceededResponse,
-  rateLimitHeaders,
 } from "@/lib/rate-limit";
 import { sanitizeName, sanitizePhone, sanitizeComment } from "@/lib/sanitize";
 

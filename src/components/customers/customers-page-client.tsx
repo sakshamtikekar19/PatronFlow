@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Users, Trash2, X, Gift, MessageCircle, Cake } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
 import { CustomerTable } from "@/components/customer-table";
@@ -66,11 +66,6 @@ export function CustomersPageClient({
   const [pointsAmount, setPointsAmount] = useState("");
   const [pointsNotes, setPointsNotes] = useState("");
   const [isAddingPoints, startAddingPoints] = useTransition();
-
-  // Keep local state in sync if server data changes (e.g. after revalidation).
-  useEffect(() => {
-    setCustomers(initialCustomers);
-  }, [initialCustomers]);
 
   const counts = SEGMENT_ORDER.reduce(
     (acc, seg) => {
