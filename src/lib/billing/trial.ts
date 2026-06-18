@@ -2,6 +2,7 @@
  * Trial status utilities
  */
 
+import { differenceInCalendarDays, startOfDay } from "date-fns";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BILLING_CONFIG } from "./config";
 
@@ -10,6 +11,21 @@ export interface TrialStatus {
   trialDaysRemaining: number;
   trialEndsAt: Date | null;
   hasExpired: boolean;
+}
+
+/**
+ * Calendar days until trial ends (matches Supabase subscription_overview).
+ * Counts the end date; shows 1 on the last active calendar day.
+ */
+export function getTrialDaysRemaining(
+  trialEndsAt: Date | string,
+  now: Date = new Date()
+): number {
+  const end = new Date(trialEndsAt);
+  if (now >= end) return 0;
+
+  const calendarDays = differenceInCalendarDays(startOfDay(end), startOfDay(now));
+  return calendarDays === 0 ? 1 : calendarDays;
 }
 
 /**
@@ -44,14 +60,13 @@ export async function getTrialStatus(restaurantId: string): Promise<TrialStatus>
 
   const trialEndsAt = new Date(subscription.trial_ends_at);
   const now = new Date();
-  const msRemaining = trialEndsAt.getTime() - now.getTime();
-  const daysRemaining = Math.max(0, Math.ceil(msRemaining / (1000 * 60 * 60 * 24)));
+  const daysRemaining = getTrialDaysRemaining(trialEndsAt, now);
 
   return {
-    isOnTrial: daysRemaining > 0,
+    isOnTrial: now < trialEndsAt,
     trialDaysRemaining: daysRemaining,
     trialEndsAt,
-    hasExpired: daysRemaining <= 0,
+    hasExpired: now >= trialEndsAt,
   };
 }
 
@@ -61,11 +76,7 @@ export async function getTrialStatus(restaurantId: string): Promise<TrialStatus>
 export function isTrialEndingSoon(trialEndsAt: Date | null): boolean {
   if (!trialEndsAt) return false;
 
-  const now = new Date();
-  const daysUntilEnd = Math.ceil(
-    (trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
+  const daysUntilEnd = getTrialDaysRemaining(trialEndsAt);
   return daysUntilEnd > 0 && daysUntilEnd <= 3;
 }
 
@@ -123,10 +134,7 @@ export async function getTrialsEndingSoon(withinDays: number = 3): Promise<
       restaurantId: sub.restaurant_id,
       ownerId: restaurants?.owner_id ?? "",
       trialEndsAt: sub.trial_ends_at!,
-      daysRemaining: Math.ceil(
-        (new Date(sub.trial_ends_at!).getTime() - now.getTime()) /
-          (1000 * 60 * 60 * 24)
-      ),
+      daysRemaining: getTrialDaysRemaining(sub.trial_ends_at!),
     };
   });
 }

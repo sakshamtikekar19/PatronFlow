@@ -18,7 +18,10 @@ SELECT
   s.trial_ends_at,
   CASE
     WHEN s.status = 'trialing' AND s.trial_ends_at IS NOT NULL THEN
-      GREATEST(0, EXTRACT(DAY FROM (s.trial_ends_at - now()))::integer)
+      CASE
+        WHEN s.trial_ends_at <= now() THEN 0
+        ELSE GREATEST(1, (s.trial_ends_at::date - CURRENT_DATE))
+      END
     ELSE NULL
   END AS trial_days_remaining,
   s.current_period_start,

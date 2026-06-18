@@ -1,6 +1,6 @@
 -- =============================================================================
--- PatronFlow Migration 006: Subscription overview view
--- Human-readable subscription list for Supabase Table Editor / admin queries
+-- PatronFlow Migration 008: Fix trial_days_remaining calendar-day calculation
+-- Aligns Supabase view with app (was EXTRACT(DAY) which under-counted by 1)
 -- =============================================================================
 
 CREATE OR REPLACE VIEW public.subscription_overview

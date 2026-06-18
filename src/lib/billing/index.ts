@@ -10,6 +10,7 @@ import { createCheckoutSession, createPortalSession } from "@/lib/stripe/checkou
 import { createRazorpaySubscription, cancelRazorpaySubscription } from "@/lib/razorpay/subscription";
 import type { Subscription, SubscriptionStatus, PaymentProvider } from "@/types/database.types";
 import { isInGracePeriod } from "./config";
+import { getTrialDaysRemaining } from "./trial";
 
 export type BillingProvider = "stripe" | "razorpay" | "paypal";
 
@@ -80,9 +81,7 @@ export async function getSubscriptionStatus(
   if (subscription.status === "trialing" && subscription.trial_ends_at) {
     const trialEnd = new Date(subscription.trial_ends_at);
     if (now < trialEnd) {
-      const daysRemaining = Math.ceil(
-        (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-      );
+      const daysRemaining = getTrialDaysRemaining(trialEnd, now);
       return {
         status: "trialing",
         isActive: true,
