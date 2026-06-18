@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getUserAppAccess } from "@/lib/billing/subscription-access";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -60,15 +61,59 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/settings") ||
     pathname.startsWith("/billing");
 
+  const isBillingRoute = pathname.startsWith("/billing");
+  const isOnboardingRoute = pathname.startsWith("/onboarding");
+  const isApiBillingRoute = pathname.startsWith("/api/billing");
+
+  if (user) {
+    const needsAccessCheck =
+      isProtectedRoute || isAuthRoute || isOnboardingRoute || pathname === "/";
+
+    if (needsAccessCheck) {
+      const access = await getUserAppAccess(user.id);
+
+      if (
+        access.needsOnboarding &&
+        isProtectedRoute &&
+        !isOnboardingRoute &&
+        !isBillingRoute
+      ) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
+      }
+
+      if (access.isLocked) {
+        const allowedWhileLocked =
+          isBillingRoute ||
+          isApiBillingRoute ||
+          isPublicRoute ||
+          pathname.startsWith("/auth/") ||
+          pathname === "/forgot-password" ||
+          pathname === "/reset-password";
+
+        if (!allowedWhileLocked) {
+          const url = request.nextUrl.clone();
+          url.pathname = "/billing";
+          return NextResponse.redirect(url);
+        }
+      }
+
+      if (isAuthRoute) {
+        const url = request.nextUrl.clone();
+        url.pathname = access.isLocked
+          ? "/billing"
+          : access.needsOnboarding
+            ? "/onboarding"
+            : "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 

@@ -40,8 +40,19 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
     <div className="space-y-6">
       <PageHeader
         title="Billing"
-        description="Manage your subscription and payment methods"
+        description={
+          subscriptionStatus.isActive
+            ? "Manage your subscription and payment methods"
+            : "Your trial has ended. Subscribe to restore access to PatronFlow."
+        }
       />
+
+      {!subscriptionStatus.isActive && (
+        <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+          Your subscription is inactive. Upgrade below to unlock your dashboard,
+          customers, and all other features.
+        </div>
+      )}
 
       {params.success && (
         <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">

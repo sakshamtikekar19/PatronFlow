@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { BillingOnlyLayout } from "@/components/layout/billing-only-layout";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { getSubscriptionStatus } from "@/lib/billing";
@@ -33,13 +34,22 @@ export default async function DashboardRootLayout({
   const isBillingPage = pathname.startsWith("/billing");
 
   let subscriptionStatus = null;
+  let isLocked = false;
   if (restaurant) {
     subscriptionStatus = await getSubscriptionStatus(restaurant.id);
+    isLocked = !subscriptionStatus.isActive;
 
-    // If subscription is expired and not on billing page, redirect to billing
-    if (!subscriptionStatus.isActive && !isBillingPage) {
+    if (isLocked && !isBillingPage) {
       redirect("/billing");
     }
+  }
+
+  if (isLocked) {
+    return (
+      <BillingOnlyLayout userEmail={user.email}>
+        {children}
+      </BillingOnlyLayout>
+    );
   }
 
   return (

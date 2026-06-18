@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { getSubscriptionStatus } from "@/lib/billing";
 import { buildReviewUrl } from "@/lib/review-url";
 
 export default async function OnboardingPage() {
@@ -8,6 +9,11 @@ export default async function OnboardingPage() {
 
   if (!restaurant) {
     redirect("/login");
+  }
+
+  const subscriptionStatus = await getSubscriptionStatus(restaurant.id);
+  if (!subscriptionStatus.isActive) {
+    redirect("/billing");
   }
 
   if (restaurant.onboarded) {
