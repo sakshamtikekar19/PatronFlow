@@ -2,10 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 
 export async function markFeedbackResolved(
   feedbackId: string
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const { error } = await supabase

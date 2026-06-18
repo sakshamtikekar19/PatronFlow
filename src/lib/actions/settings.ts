@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 
 export interface SettingsFormData {
   name: string;
@@ -23,6 +24,9 @@ const ALLOWED_LOGO_TYPES = [
 export async function updateRestaurantSettings(
   data: SettingsFormData
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const {
@@ -56,6 +60,9 @@ export async function updateRestaurantSettings(
 export async function uploadRestaurantLogo(
   formData: FormData
 ): Promise<{ error?: string; logoUrl?: string }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const {
@@ -155,6 +162,9 @@ export async function removeRestaurantLogo(): Promise<{
   error?: string;
   success?: boolean;
 }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const {

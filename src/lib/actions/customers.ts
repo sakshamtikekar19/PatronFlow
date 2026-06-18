@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 
 /**
  * Delete one or more customers belonging to the current owner's restaurant.
@@ -12,6 +13,9 @@ import { getRestaurantForUser } from "@/lib/queries/restaurant";
 export async function deleteCustomers(
   ids: string[]
 ): Promise<{ error?: string; deletedCount?: number }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
   if (uniqueIds.length === 0) {
     return { error: "No customers selected" };

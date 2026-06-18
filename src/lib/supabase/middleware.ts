@@ -1,6 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getUserAppAccess } from "@/lib/billing/subscription-access";
+import {
+  isBillingApiRoute,
+  isProtectedApiRoute,
+} from "@/lib/security/api-access";
+import {
+  checkRateLimit,
+  getClientIpFromRequest,
+  rateLimitExceededResponse,
+  rateLimiters,
+} from "@/lib/rate-limit";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -63,16 +73,40 @@ export async function updateSession(request: NextRequest) {
 
   const isBillingRoute = pathname.startsWith("/billing");
   const isOnboardingRoute = pathname.startsWith("/onboarding");
-  const isApiBillingRoute = pathname.startsWith("/api/billing");
+
+  if (!user && isProtectedApiRoute(pathname)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (user && isProtectedApiRoute(pathname)) {
+    const ip = getClientIpFromRequest(request);
+    const rateLimit = await checkRateLimit(
+      `user:${user.id}:${ip}`,
+      rateLimiters.general,
+      "dashboard-api"
+    );
+    if (!rateLimit.success) {
+      return rateLimitExceededResponse(rateLimit);
+    }
+  }
 
   if (user) {
     const needsAccessCheck =
-      isProtectedRoute || isAuthRoute || isOnboardingRoute || pathname === "/";
+      isProtectedRoute ||
+      isProtectedApiRoute(pathname) ||
+      isAuthRoute ||
+      isOnboardingRoute ||
+      pathname === "/";
 
     if (needsAccessCheck) {
       const access = await getUserAppAccess(user.id);
 
+      const subscriptionInactive = Boolean(
+        access.restaurant && !access.isActive
+      );
+
       if (
+        !subscriptionInactive &&
         access.needsOnboarding &&
         isProtectedRoute &&
         !isOnboardingRoute &&
@@ -83,16 +117,29 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
-      if (access.isLocked) {
-        const allowedWhileLocked =
+      if (subscriptionInactive) {
+        if (isProtectedApiRoute(pathname)) {
+          return NextResponse.json(
+            {
+              error: "Subscription required",
+              code: "SUBSCRIPTION_INACTIVE",
+            },
+            { status: 403 }
+          );
+        }
+
+        const allowedWhileInactive =
           isBillingRoute ||
-          isApiBillingRoute ||
+          isBillingApiRoute(pathname) ||
           isPublicRoute ||
           pathname.startsWith("/auth/") ||
           pathname === "/forgot-password" ||
           pathname === "/reset-password";
 
-        if (!allowedWhileLocked) {
+        if (
+          !allowedWhileInactive &&
+          (isProtectedRoute || isOnboardingRoute || pathname === "/")
+        ) {
           const url = request.nextUrl.clone();
           url.pathname = "/billing";
           return NextResponse.redirect(url);
@@ -101,7 +148,7 @@ export async function updateSession(request: NextRequest) {
 
       if (isAuthRoute) {
         const url = request.nextUrl.clone();
-        url.pathname = access.isLocked
+        url.pathname = subscriptionInactive
           ? "/billing"
           : access.needsOnboarding
             ? "/onboarding"

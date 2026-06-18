@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { buildReviewUrl } from "@/lib/review-url";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 import type { TableQr } from "@/types";
 
 export async function createTableQr(
   tableName: string
 ): Promise<{ error?: string; tableQr?: TableQr }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const trimmed = tableName.trim();
   if (!trimmed) {
     return { error: "Table name is required" };
@@ -47,6 +51,9 @@ export async function createTableQr(
 export async function deleteTableQr(
   id: string
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };

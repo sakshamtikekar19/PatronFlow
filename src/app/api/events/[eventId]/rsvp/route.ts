@@ -22,7 +22,11 @@ export async function POST(
   try {
     // Rate limiting
     const ip = await getClientIp();
-    const rateLimit = checkRateLimit(`rsvp:${ip}`, rateLimiters.publicApi);
+    const rateLimit = await checkRateLimit(
+      `rsvp:${ip}`,
+      rateLimiters.publicApi,
+      "rsvp"
+    );
     if (!rateLimit.success) {
       return rateLimitExceededResponse(rateLimit);
     }

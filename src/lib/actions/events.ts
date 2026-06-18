@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { generateUniqueEventSlug } from "@/lib/slug";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 import type { Event, EventStatus } from "@/types";
 
 interface EventInput {
@@ -18,6 +19,9 @@ interface EventInput {
 export async function createEvent(
   input: EventInput
 ): Promise<{ error?: string; event?: Event }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const title = input.title.trim();
   if (!title) return { error: "Event title is required" };
 
@@ -54,6 +58,9 @@ export async function updateEvent(
   id: string,
   input: EventInput
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const title = input.title.trim();
   if (!title) return { error: "Event title is required" };
 
@@ -61,7 +68,7 @@ export async function updateEvent(
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
 
-  // Backfill a slug for legacy events that predate slugs; keep it stable
+  // Backfill a slug for legacy events
   // afterwards so the public URL never changes.
   const { data: existing } = await supabase
     .from("events")
@@ -100,6 +107,9 @@ export async function setEventStatus(
   id: string,
   status: EventStatus
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
@@ -120,6 +130,9 @@ export async function setEventStatus(
 export async function deleteEvent(
   id: string
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
@@ -145,6 +158,9 @@ export async function toggleRsvpAttendance(
   rsvpId: string,
   attended: boolean
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const { error } = await supabase

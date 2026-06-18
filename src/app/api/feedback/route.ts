@@ -32,7 +32,11 @@ export async function POST(request: Request) {
   try {
     // Rate limiting
     const ip = await getClientIp();
-    const rateLimit = checkRateLimit(`feedback:${ip}`, rateLimiters.publicApi);
+    const rateLimit = await checkRateLimit(
+      `feedback:${ip}`,
+      rateLimiters.publicApi,
+      "feedback"
+    );
     if (!rateLimit.success) {
       return rateLimitExceededResponse(rateLimit);
     }

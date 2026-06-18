@@ -18,7 +18,11 @@ export async function POST(request: Request) {
   try {
     // Rate limiting - stricter for lookup to prevent enumeration
     const ip = await getClientIp();
-    const rateLimit = checkRateLimit(`lookup:${ip}`, rateLimiters.lookup);
+    const rateLimit = await checkRateLimit(
+      `lookup:${ip}`,
+      rateLimiters.lookup,
+      "lookup"
+    );
     if (!rateLimit.success) {
       return rateLimitExceededResponse(rateLimit);
     }

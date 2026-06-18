@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 import type { LoyaltyRule, LoyaltyTransactionType } from "@/types";
 
 export async function createLoyaltyRule(input: {
@@ -10,6 +11,9 @@ export async function createLoyaltyRule(input: {
   pointsRequired: number;
   rewardDescription?: string;
 }): Promise<{ error?: string; rule?: LoyaltyRule }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const rewardName = input.rewardName.trim();
   if (!rewardName) return { error: "Reward name is required" };
   if (!Number.isFinite(input.pointsRequired) || input.pointsRequired < 0) {
@@ -40,6 +44,9 @@ export async function createLoyaltyRule(input: {
 export async function deleteLoyaltyRule(
   id: string
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
   const restaurant = await getRestaurantForUser();
   if (!restaurant) return { error: "Restaurant not found" };
@@ -66,6 +73,9 @@ export async function addLoyaltyTransaction(input: {
   type: LoyaltyTransactionType;
   notes?: string;
 }): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   if (!Number.isFinite(input.points) || input.points === 0) {
     return { error: "Enter a non-zero point amount" };
   }

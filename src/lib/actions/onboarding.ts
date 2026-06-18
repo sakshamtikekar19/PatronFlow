@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateUniqueRestaurantSlug } from "@/lib/slug";
+import { requireActiveSubscription } from "@/lib/billing/guards";
 
 export interface OnboardingData {
   name: string;
@@ -15,6 +16,9 @@ export interface OnboardingData {
 export async function saveOnboardingDetails(
   data: OnboardingData
 ): Promise<{ error?: string; success?: boolean }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const {
@@ -61,6 +65,9 @@ export async function completeOnboarding(): Promise<{
   error?: string;
   success?: boolean;
 }> {
+  const subscriptionError = await requireActiveSubscription();
+  if (subscriptionError.error) return subscriptionError;
+
   const supabase = await createClient();
 
   const {
