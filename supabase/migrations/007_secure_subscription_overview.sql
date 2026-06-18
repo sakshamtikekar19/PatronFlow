@@ -1,6 +1,6 @@
 -- =============================================================================
--- PatronFlow Migration 006: Subscription overview view
--- Human-readable subscription list for Supabase Table Editor / admin queries
+-- PatronFlow Migration 007: Secure subscription_overview view
+-- Uses security_invoker and blocks public API access (admin / SQL editor only)
 -- =============================================================================
 
 CREATE OR REPLACE VIEW public.subscription_overview
@@ -37,6 +37,7 @@ LEFT JOIN public.plans p ON p.id = s.plan_id;
 COMMENT ON VIEW public.subscription_overview IS
   'Admin-only readable subscription list. Not exposed via Data API to app users.';
 
+-- Remove from Supabase Data API (anon/authenticated). Dashboard uses postgres role.
 REVOKE ALL ON public.subscription_overview FROM PUBLIC;
 REVOKE ALL ON public.subscription_overview FROM anon, authenticated;
 GRANT SELECT ON public.subscription_overview TO service_role;
