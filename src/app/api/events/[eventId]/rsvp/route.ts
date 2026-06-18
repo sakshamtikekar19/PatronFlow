@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
+import {
+  checkRateLimit,
+  getClientIp,
+  rateLimiters,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
+import { sanitizeName, sanitizePhone, sanitizeEmail } from "@/lib/sanitize";
 
 const rsvpSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -13,6 +20,12 @@ export async function POST(
   { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
+    // Rate limiting
+    const ip = await getClientIp();
+    const rateLimit = checkRateLimit(`rsvp:${ip}`, rateLimiters.publicApi);
+    if (!rateLimit.success) {
+      return rateLimitExceededResponse(rateLimit);
+    }
     const { eventId } = await params;
     const body = await request.json();
     const parsed = rsvpSchema.safeParse(body);
@@ -42,13 +55,16 @@ export async function POST(
       );
     }
 
-    const { name, phone, email } = parsed.data;
+    // Sanitize user input
+    const name = sanitizeName(parsed.data.name);
+    const phone = sanitizePhone(parsed.data.phone);
+    const email = parsed.data.email ? sanitizeEmail(parsed.data.email) : null;
 
     const { error } = await supabase.from("event_rsvps").insert({
       event_id: eventId,
       name,
       phone,
-      email: email || null,
+      email,
     });
 
     if (error) {

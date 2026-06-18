@@ -1,0 +1,70 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { getBillingData, getActivePlans } from "@/lib/queries/billing";
+import { getSubscriptionStatus, getAvailableProviders } from "@/lib/billing";
+import { createClient } from "@/lib/supabase/server";
+import { PageHeader } from "@/components/page-header";
+import { BillingPageClient } from "@/components/billing/billing-page-client";
+
+export const metadata: Metadata = {
+  title: "Billing",
+};
+
+interface BillingPageProps {
+  searchParams: Promise<{ success?: string; cancelled?: string }>;
+}
+
+export default async function BillingPage({ searchParams }: BillingPageProps) {
+  const restaurant = await getRestaurantForUser();
+
+  if (!restaurant) {
+    redirect("/onboarding");
+  }
+
+  const [billingData, plans, subscriptionStatus] = await Promise.all([
+    getBillingData(restaurant.id),
+    getActivePlans(),
+    getSubscriptionStatus(restaurant.id),
+  ]);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const availableProviders = getAvailableProviders();
+  const params = await searchParams;
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Billing"
+        description="Manage your subscription and payment methods"
+      />
+
+      {params.success && (
+        <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">
+          Payment successful! Your subscription is now active.
+        </div>
+      )}
+
+      {params.cancelled && (
+        <div className="rounded-xl bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+          Payment was cancelled. You can try again anytime.
+        </div>
+      )}
+
+      <BillingPageClient
+        subscription={billingData.subscription}
+        plan={billingData.plan}
+        payments={billingData.payments}
+        plans={plans}
+        subscriptionStatus={subscriptionStatus}
+        availableProviders={availableProviders}
+        userEmail={user?.email ?? ""}
+        restaurantName={restaurant.name}
+      />
+    </div>
+  );
+}

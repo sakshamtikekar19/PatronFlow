@@ -1,0 +1,20 @@
+-- =============================================================================
+-- PatronFlow Migration 001: Initial Schema
+-- This consolidates the base schema for reference. Run schema.sql for fresh installs.
+-- =============================================================================
+
+-- This migration is a placeholder documenting that the initial schema was applied.
+-- For fresh installs, run supabase/schema.sql directly.
+-- 
+-- Tables created:
+--   - restaurants
+--   - customers
+--   - feedback
+--   - table_qrs
+--   - customer_visits
+--   - loyalty_transactions
+--   - loyalty_rules
+--   - events
+--   - event_rsvps
+--
+-- See supabase/schema.sql for the full initial schema.

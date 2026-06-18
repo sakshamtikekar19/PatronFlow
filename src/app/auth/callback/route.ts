@@ -20,7 +20,15 @@ export async function GET(request: Request) {
       token_hash: tokenHash,
     });
     if (!error) {
+      // Password recovery flow: redirect to reset-password page
+      if (type === "recovery") {
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
       return NextResponse.redirect(`${origin}${next}`);
+    }
+    // Recovery link failed - redirect to reset-password with error
+    if (type === "recovery") {
+      return NextResponse.redirect(`${origin}/reset-password?error=invalid_token`);
     }
   }
 
@@ -28,7 +36,15 @@ export async function GET(request: Request) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // Check if this is a password recovery flow
+      if (next === "/reset-password") {
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
       return NextResponse.redirect(`${origin}${next}`);
+    }
+    // Recovery link failed
+    if (next === "/reset-password") {
+      return NextResponse.redirect(`${origin}/reset-password?error=invalid_token`);
     }
   }
 

@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
+import {
+  checkRateLimit,
+  getClientIp,
+  rateLimiters,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
+import { sanitizePhone } from "@/lib/sanitize";
 
 const lookupSchema = z.object({
   restaurantId: z.string().uuid(),
@@ -9,6 +16,12 @@ const lookupSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting - stricter for lookup to prevent enumeration
+    const ip = await getClientIp();
+    const rateLimit = checkRateLimit(`lookup:${ip}`, rateLimiters.lookup);
+    if (!rateLimit.success) {
+      return rateLimitExceededResponse(rateLimit);
+    }
     const body = await request.json();
     const parsed = lookupSchema.safeParse(body);
 
@@ -22,7 +35,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { restaurantId, phone } = parsed.data;
+    const { restaurantId } = parsed.data;
+    const phone = sanitizePhone(parsed.data.phone);
     const supabase = createAdminClient();
 
     const { data: customer } = await supabase

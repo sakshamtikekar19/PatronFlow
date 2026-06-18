@@ -12,6 +12,10 @@ export type RecoveryStatus = "pending" | "contacted" | "resolved";
 export type LoyaltyTransactionType = "earned" | "redeemed" | "adjusted";
 export type EventStatus = "draft" | "published" | "completed";
 
+// Billing enums
+export type SubscriptionStatus = "trialing" | "active" | "past_due" | "cancelled" | "expired";
+export type PaymentProvider = "stripe" | "razorpay" | "paypal";
+
 export interface Restaurant {
   id: string;
   owner_id: string;
@@ -106,6 +110,55 @@ export interface EventRsvp {
   phone: string;
   email: string | null;
   attended: boolean;
+  created_at: string;
+}
+
+// Billing types
+export interface Plan {
+  id: string;
+  name: string;
+  description: string | null;
+  price_monthly_inr: number;
+  price_monthly_usd: number;
+  stripe_price_id: string | null;
+  razorpay_plan_id: string | null;
+  paypal_plan_id: string | null;
+  features: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Subscription {
+  id: string;
+  restaurant_id: string;
+  plan_id: string | null;
+  status: SubscriptionStatus;
+  provider: PaymentProvider | null;
+  provider_subscription_id: string | null;
+  provider_customer_id: string | null;
+  trial_ends_at: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  cancelled_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Payment {
+  id: string;
+  subscription_id: string;
+  provider: PaymentProvider;
+  provider_payment_id: string | null;
+  provider_invoice_id: string | null;
+  amount: number;
+  currency: string;
+  status: string;
+  invoice_url: string | null;
+  receipt_url: string | null;
+  failure_reason: string | null;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -333,6 +386,116 @@ export interface Database {
           },
         ];
       };
+      plans: {
+        Row: Plan;
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          price_monthly_inr?: number;
+          price_monthly_usd?: number;
+          stripe_price_id?: string | null;
+          razorpay_plan_id?: string | null;
+          paypal_plan_id?: string | null;
+          features?: string[];
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          description?: string | null;
+          price_monthly_inr?: number;
+          price_monthly_usd?: number;
+          stripe_price_id?: string | null;
+          razorpay_plan_id?: string | null;
+          paypal_plan_id?: string | null;
+          features?: string[];
+          is_active?: boolean;
+        };
+        Relationships: [];
+      };
+      subscriptions: {
+        Row: Subscription;
+        Insert: {
+          id?: string;
+          restaurant_id: string;
+          plan_id?: string | null;
+          status?: SubscriptionStatus;
+          provider?: PaymentProvider | null;
+          provider_subscription_id?: string | null;
+          provider_customer_id?: string | null;
+          trial_ends_at?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          cancelled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          plan_id?: string | null;
+          status?: SubscriptionStatus;
+          provider?: PaymentProvider | null;
+          provider_subscription_id?: string | null;
+          provider_customer_id?: string | null;
+          trial_ends_at?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          cancelled_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_restaurant_id_fkey";
+            columns: ["restaurant_id"];
+            isOneToOne: true;
+            referencedRelation: "restaurants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey";
+            columns: ["plan_id"];
+            isOneToOne: false;
+            referencedRelation: "plans";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payments: {
+        Row: Payment;
+        Insert: {
+          id?: string;
+          subscription_id: string;
+          provider: PaymentProvider;
+          provider_payment_id?: string | null;
+          provider_invoice_id?: string | null;
+          amount: number;
+          currency?: string;
+          status: string;
+          invoice_url?: string | null;
+          receipt_url?: string | null;
+          failure_reason?: string | null;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          status?: string;
+          invoice_url?: string | null;
+          receipt_url?: string | null;
+          failure_reason?: string | null;
+          metadata?: Record<string, unknown>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payments_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -342,7 +505,18 @@ export interface Database {
       recovery_status: RecoveryStatus;
       loyalty_transaction_type: LoyaltyTransactionType;
       event_status: EventStatus;
+      subscription_status: SubscriptionStatus;
+      payment_provider: PaymentProvider;
     };
     CompositeTypes: Record<string, never>;
   };
+}
+
+// Utility types for billing
+export interface SubscriptionWithPlan extends Subscription {
+  plan: Plan | null;
+}
+
+export interface PaymentWithSubscription extends Payment {
+  subscription: Subscription;
 }

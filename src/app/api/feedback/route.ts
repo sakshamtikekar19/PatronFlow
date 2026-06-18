@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PublicFeedbackResponse } from "@/types";
 import { z } from "zod";
+import {
+  checkRateLimit,
+  getClientIp,
+  rateLimiters,
+  rateLimitExceededResponse,
+  rateLimitHeaders,
+} from "@/lib/rate-limit";
+import { sanitizeName, sanitizePhone, sanitizeComment } from "@/lib/sanitize";
 
 const feedbackSchema = z.object({
   restaurantId: z.string().uuid(),
@@ -23,6 +31,12 @@ const feedbackSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const ip = await getClientIp();
+    const rateLimit = checkRateLimit(`feedback:${ip}`, rateLimiters.publicApi);
+    if (!rateLimit.success) {
+      return rateLimitExceededResponse(rateLimit);
+    }
     const body = await request.json();
     const parsed = feedbackSchema.safeParse(body);
 
@@ -33,8 +47,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Sanitize user input
+    const sanitizedData = {
+      restaurantId: parsed.data.restaurantId,
+      name: parsed.data.name ? sanitizeName(parsed.data.name) : undefined,
+      phone: sanitizePhone(parsed.data.phone),
+      birthday: parsed.data.birthday,
+      rating: parsed.data.rating,
+      comment: parsed.data.comment ? sanitizeComment(parsed.data.comment) : undefined,
+      category: parsed.data.category,
+      tableName: parsed.data.tableName ? sanitizeName(parsed.data.tableName) : undefined,
+      source: parsed.data.source ? sanitizeName(parsed.data.source) : undefined,
+    };
+
     const { restaurantId, name, phone, birthday, rating, comment, category, tableName, source } =
-      parsed.data;
+      sanitizedData;
 
     const supabase = createAdminClient();
 

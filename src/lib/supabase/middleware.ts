@@ -41,7 +41,13 @@ export async function updateSession(request: NextRequest) {
     // trailing slash so it stays protected by the catch-all below).
     pathname.startsWith("/events/") ||
     pathname.startsWith("/api/events/") ||
-    pathname.startsWith("/auth/callback");
+    pathname.startsWith("/api/webhooks/") ||
+    pathname.startsWith("/api/health") ||
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/privacy") ||
+    pathname.startsWith("/terms");
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/customers") ||
@@ -51,7 +57,8 @@ export async function updateSession(request: NextRequest) {
     pathname === "/events" ||
     pathname.startsWith("/qr") ||
     pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/settings");
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/billing");
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
@@ -72,6 +79,8 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
+
+  supabaseResponse.headers.set("x-pathname", pathname);
 
   return supabaseResponse;
 }
