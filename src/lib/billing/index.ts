@@ -4,9 +4,10 @@
  */
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isStripeConfigured } from "@/lib/stripe/client";
+import { getStripeClient, isStripeConfigured } from "@/lib/stripe/client";
 import { isRazorpayConfigured } from "@/lib/razorpay/client";
 import { createCheckoutSession, createPortalSession } from "@/lib/stripe/checkout";
+import { cancelStripeSubscription } from "@/lib/stripe/subscription";
 import { createRazorpaySubscription, cancelRazorpaySubscription } from "@/lib/razorpay/subscription";
 import type { Subscription, SubscriptionStatus, PaymentProvider } from "@/types/database.types";
 import { isInGracePeriod } from "./config";
@@ -204,9 +205,29 @@ export async function cancelSubscription(
   }
 
   if (subscription.provider === "stripe") {
-    // Stripe cancellation is handled via the customer portal
-    // or we can cancel via API if needed
-    return { success: true };
+    if (cancelAtPeriodEnd) {
+      const stripe = getStripeClient();
+      if (!stripe) {
+        return { success: false, error: "Stripe is not configured" };
+      }
+      try {
+        await stripe.subscriptions.update(subscription.provider_subscription_id, {
+          cancel_at_period_end: true,
+        });
+        return { success: true };
+      } catch (error) {
+        console.error("Failed to schedule Stripe cancellation:", error);
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to cancel subscription",
+        };
+      }
+    }
+
+    return cancelStripeSubscription(subscription.provider_subscription_id);
   }
 
   if (subscription.provider === "razorpay") {
@@ -217,6 +238,51 @@ export async function cancelSubscription(
   }
 
   return { success: false, error: "Unknown provider" };
+}
+
+function isBenignProviderCancelError(error?: string): boolean {
+  if (!error) return false;
+  const lower = error.toLowerCase();
+  return (
+    lower.includes("already") ||
+    lower.includes("cancelled") ||
+    lower.includes("canceled") ||
+    lower.includes("not found") ||
+    lower.includes("does not exist") ||
+    lower.includes("no such")
+  );
+}
+
+/**
+ * Cancel any provider subscription immediately before account deletion.
+ * Skips when there is no provider subscription id (e.g. trial-only).
+ */
+export async function cancelSubscriptionForAccountDeletion(
+  restaurantId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient();
+
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("provider, provider_subscription_id")
+    .eq("restaurant_id", restaurantId)
+    .maybeSingle();
+
+  if (!subscription?.provider_subscription_id) {
+    return { success: true };
+  }
+
+  const result = await cancelSubscription(restaurantId, false);
+
+  if (result.success || isBenignProviderCancelError(result.error)) {
+    await updateSubscriptionStatus(restaurantId, "cancelled", {
+      cancelled_at: new Date().toISOString(),
+      cancel_at_period_end: false,
+    });
+    return { success: true };
+  }
+
+  return result;
 }
 
 /**

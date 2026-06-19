@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cancelSubscriptionForAccountDeletion } from "@/lib/billing";
 import { requireActiveSubscription } from "@/lib/billing/guards";
+import { getRestaurantForUser } from "@/lib/queries/restaurant";
 
 export interface SettingsFormData {
   name: string;
@@ -145,6 +147,20 @@ export async function deleteAccount(): Promise<{ error?: string }> {
 
   if (!user) {
     return { error: "Not authenticated" };
+  }
+
+  const restaurant = await getRestaurantForUser();
+  if (restaurant) {
+    const cancelResult = await cancelSubscriptionForAccountDeletion(
+      restaurant.id
+    );
+    if (!cancelResult.success) {
+      return {
+        error:
+          cancelResult.error ||
+          "Could not cancel your subscription. Cancel billing first or contact support.",
+      };
+    }
   }
 
   const admin = createAdminClient();

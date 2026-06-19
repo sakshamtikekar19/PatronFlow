@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { cancelSubscriptionForAccountDeletion } from "@/lib/billing";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 
 export interface DataExportResult {
@@ -148,6 +149,15 @@ export async function deleteUserData(): Promise<{ error?: string }> {
   const restaurant = await getRestaurantForUser();
   if (!restaurant) {
     return { error: "Restaurant not found" };
+  }
+
+  const cancelResult = await cancelSubscriptionForAccountDeletion(restaurant.id);
+  if (!cancelResult.success) {
+    return {
+      error:
+        cancelResult.error ||
+        "Could not cancel your subscription. Cancel billing first or contact support.",
+    };
   }
 
   // Use admin client to delete the user (this cascades to restaurant and all related data)

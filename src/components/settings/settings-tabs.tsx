@@ -420,7 +420,8 @@ export function SettingsTabs({
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Permanently delete your account, restaurant, customers, and all
-                feedback. This cannot be undone.
+                feedback. Any active Razorpay or Stripe subscription will be
+                cancelled immediately. This cannot be undone.
               </p>
             </div>
             <DeleteAccountDialog />
