@@ -8,7 +8,6 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/config/branding";
 import { NAV_LINKS } from "@/config/landing";
-import { ContactCtaGroup } from "./contact-cta-group";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -54,13 +53,13 @@ export function LandingNavbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <ContactCtaGroup
-            size="default"
-            className="gap-2"
-            whatsappLabel="WhatsApp"
-            emailLabel="Email"
-          />
+        <div className="hidden md:block">
+          <Link
+            href="/login"
+            className="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+          >
+            Log in
+          </Link>
         </div>
 
         <button
@@ -93,8 +92,14 @@ export function LandingNavbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-3 px-1">
-                <ContactCtaGroup className="w-full" />
+              <div className="mt-3 border-t border-neutral-100 pt-3">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+                >
+                  Log in
+                </Link>
               </div>
             </nav>
           </motion.div>

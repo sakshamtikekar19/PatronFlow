@@ -22,16 +22,20 @@ export const BILLING_CONFIG = {
       id: "pro",
       name: "PatronFlow Pro",
       description: "All-inclusive plan with unlimited features",
-      priceINR: 0, // Configure when ready to launch
-      priceUSD: 0, // Configure when ready to launch
+      priceINR: 499900, // ₹4,999/month in paise
+      priceUSD: 0, // Configure when Stripe launches internationally
       features: [
         "Unlimited feedback collection",
-        "Customer database",
-        "Loyalty programs",
-        "Event management",
-        "QR code analytics",
-        "Recovery workflows",
-        "Email notifications",
+        "Customer database & visit tracking",
+        "Google review generation",
+        "Table QR codes & analytics",
+        "Guest recovery workflows",
+        "Loyalty programs & custom rules",
+        "Event management & RSVPs",
+        "Analytics dashboard",
+        "Smart notifications",
+        "Branded QR posters",
+        "Data export",
         "Priority support",
       ],
     },

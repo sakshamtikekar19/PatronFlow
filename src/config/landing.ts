@@ -13,8 +13,34 @@ export const PRIMARY_CTA_LABEL = "Contact on WhatsApp";
 export const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Contact", href: "#contact" },
+  { label: "Pricing", href: "#pricing" },
 ] as const;
+
+/** Public landing pricing — keep in sync with BILLING_CONFIG / Razorpay plan */
+export const PRICING = {
+  planName: "PatronFlow Pro",
+  priceInr: 4999,
+  priceDisplay: "₹4,999",
+  period: "month",
+  trialDays: 30,
+  tagline: "Everything you need to grow reviews, loyalty, and repeat visits.",
+  features: [
+    "30-day free trial — no credit card required",
+    "Unlimited guest feedback collection",
+    "Google review generation & smart redirects",
+    "Main feedback QR + table-specific QR codes",
+    "QR scan analytics by table",
+    "Customer CRM with profiles & visit history",
+    "Guest recovery workflows for unhappy diners",
+    "Loyalty points, rewards & custom rules",
+    "Event management with public RSVP pages",
+    "Analytics dashboard for restaurant growth",
+    "Smart notifications (complaints, VIPs, birthdays)",
+    "Branded QR posters — print & download",
+    "Customer data export (GDPR / DPDP ready)",
+    "Priority support via email & WhatsApp",
+  ],
+} as const;
 
 export const HERO = {
   headline: "Turn Guests Into Loyal Patrons.",

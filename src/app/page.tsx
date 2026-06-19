@@ -9,6 +9,7 @@ import { DashboardShowcase } from "@/components/landing/dashboard-showcase";
 import { AdvantagesSection } from "@/components/landing/advantages-section";
 import { RoiSection } from "@/components/landing/roi-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
+import { PricingSection } from "@/components/landing/pricing-section";
 import { FinalCta } from "@/components/landing/final-cta";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { BRAND, BRAND_TITLE } from "@/config/branding";
@@ -32,6 +33,7 @@ export default function Home() {
         <AdvantagesSection />
         <RoiSection />
         <TestimonialsSection />
+        <PricingSection />
         <FinalCta />
       </main>
       <LandingFooter />
