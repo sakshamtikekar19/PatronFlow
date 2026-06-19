@@ -147,6 +147,8 @@
  * card even when the visitor's system is in dark mode.
  */
 .theme-light {
+  color-scheme: light;
+  color: var(--foreground);
   --background: #f5f2ed;
   --foreground: #0a0a0a;
   --surface: #ffffff;
@@ -167,4 +169,22 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+}
+
+/* Keep typed text visible on mobile (iOS dark mode / autofill). */
+.theme-light input,
+.theme-light textarea,
+.theme-light [data-slot="input"],
+.theme-light [data-slot="textarea"],
+.theme-light [data-slot="select-trigger"] {
+  color: var(--card-foreground);
+  -webkit-text-fill-color: var(--card-foreground);
+  caret-color: var(--card-foreground);
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: var(--muted-foreground);
+  -webkit-text-fill-color: var(--muted-foreground);
+  opacity: 1;
 }

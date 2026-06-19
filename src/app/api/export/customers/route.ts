@@ -4,6 +4,11 @@ import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { getCustomersWithStats } from "@/lib/queries/customers";
 import { classifyCustomer } from "@/lib/segments";
 import { toCsv, csvResponseHeaders } from "@/lib/csv";
+import {
+  checkRateLimit,
+  rateLimiters,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -13,6 +18,15 @@ export async function GET(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = await checkRateLimit(
+    `export-customers:${user.id}`,
+    rateLimiters.export,
+    "export"
+  );
+  if (!rateLimit.success) {
+    return rateLimitExceededResponse(rateLimit);
   }
 
   const restaurant = await getRestaurantForUser();

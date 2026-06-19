@@ -279,7 +279,7 @@ export function ReviewForm({
           placeholder="+91 98765 43210"
           required
           disabled={hasLookedUpGuest}
-          className="h-12 rounded-xl border-border bg-card"
+          className="h-12 rounded-xl border-border bg-card text-foreground"
         />
         {hasLookedUpGuest && (
           <button
@@ -310,7 +310,7 @@ export function ReviewForm({
               onChange={(e) => setName(e.target.value)}
               placeholder="Aarav Sharma"
               required
-              className="h-12 rounded-xl border-border bg-card"
+              className="h-12 rounded-xl border-border bg-card text-foreground"
             />
           </div>
 
@@ -323,7 +323,7 @@ export function ReviewForm({
               onChange={(e) => setBirthday(e.target.value)}
               max={todayStr}
               required
-              className="h-12 rounded-xl border-border bg-card"
+              className="h-12 rounded-xl border-border bg-card text-foreground"
             />
             <p className="text-xs text-muted-foreground">
               We&apos;ll surprise you with something special on your day.
@@ -354,7 +354,7 @@ export function ReviewForm({
                 val && setCategory(val as FeedbackCategory)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-border bg-card">
+              <SelectTrigger className="h-12 w-full rounded-xl border-border bg-card text-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -375,7 +375,7 @@ export function ReviewForm({
               onChange={(e) => setComment(e.target.value)}
               placeholder="Tell us about your experience..."
               rows={4}
-              className="rounded-xl border-border bg-card resize-none"
+              className="rounded-xl border-border bg-card text-foreground resize-none"
             />
           </div>
         </>

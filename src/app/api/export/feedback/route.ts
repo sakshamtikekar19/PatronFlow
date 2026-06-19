@@ -3,6 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { toCsv, csvResponseHeaders } from "@/lib/csv";
 import type { FeedbackWithCustomer } from "@/types";
+import {
+  checkRateLimit,
+  rateLimiters,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -12,6 +17,15 @@ export async function GET(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = await checkRateLimit(
+    `export-feedback:${user.id}`,
+    rateLimiters.export,
+    "export"
+  );
+  if (!rateLimit.success) {
+    return rateLimitExceededResponse(rateLimit);
   }
 
   const restaurant = await getRestaurantForUser();

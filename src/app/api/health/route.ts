@@ -31,9 +31,10 @@ export async function GET() {
     {
       status: allHealthy ? "healthy" : "unhealthy",
       timestamp: new Date().toISOString(),
-      checks,
-      version: process.env.npm_package_version || "0.1.0",
     },
-    { status: allHealthy ? 200 : 503 }
+    {
+      status: allHealthy ? 200 : 503,
+      headers: { "Cache-Control": "no-store" },
+    }
   );
 }

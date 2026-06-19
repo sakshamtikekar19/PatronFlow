@@ -140,6 +140,7 @@ export function RsvpForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
+            className="h-12 rounded-xl border-border bg-card text-foreground"
           />
         </div>
         <div className="space-y-1.5">
@@ -151,6 +152,7 @@ export function RsvpForm({
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="Your phone number"
+            className="h-12 rounded-xl border-border bg-card text-foreground"
           />
         </div>
         <div className="space-y-1.5">
@@ -163,6 +165,7 @@ export function RsvpForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
+            className="h-12 rounded-xl border-border bg-card text-foreground"
           />
         </div>
 
