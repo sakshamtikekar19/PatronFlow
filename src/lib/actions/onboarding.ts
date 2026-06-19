@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { generateUniqueRestaurantSlug } from "@/lib/slug";
 import { requireActiveSubscription } from "@/lib/billing/guards";
 
@@ -30,13 +31,14 @@ export async function saveOnboardingDetails(
   const name = data.name.trim();
   if (!name) return { error: "Restaurant name is required" };
 
+  const restaurant = await ensureRestaurantForUser();
+  if (!restaurant) {
+    return { error: "Could not set up your restaurant. Please try again." };
+  }
+
   // Fetch the current row so we only mint a slug once (slugs are permanent so
   // public review URLs never change, even if the name is edited later).
-  const { data: existing } = await supabase
-    .from("restaurants")
-    .select("id, slug")
-    .eq("owner_id", user.id)
-    .single();
+  const existing = { id: restaurant.id, slug: restaurant.slug };
 
   let slug = existing?.slug ?? undefined;
   if (!slug) {

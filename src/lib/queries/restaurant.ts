@@ -21,6 +21,43 @@ export async function getRestaurantForUser(): Promise<Restaurant | null> {
   return data;
 }
 
+/**
+ * Re-provision a restaurant row when the owner account exists but their
+ * restaurant was deleted manually (e.g. from the Supabase table editor).
+ * Mirrors the on_auth_user_created trigger; also fires the trial subscription trigger.
+ */
+export async function ensureRestaurantForUser(): Promise<Restaurant | null> {
+  const existing = await getRestaurantForUser();
+  if (existing) return existing;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const admin = createAdminClient();
+  const name =
+    (user.user_metadata?.restaurant_name as string | undefined)?.trim() ||
+    "My Restaurant";
+
+  const { data, error } = await admin
+    .from("restaurants")
+    .insert({ owner_id: user.id, name })
+    .select("*")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      return getRestaurantForUser();
+    }
+    return null;
+  }
+
+  return data;
+}
+
 export async function getRestaurantById(
   id: string
 ): Promise<Restaurant | null> {

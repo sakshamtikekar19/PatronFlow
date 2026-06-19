@@ -3,7 +3,10 @@ import { headers } from "next/headers";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { BillingOnlyLayout } from "@/components/layout/billing-only-layout";
 import { createClient } from "@/lib/supabase/server";
-import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import {
+  ensureRestaurantForUser,
+  getRestaurantForUser,
+} from "@/lib/queries/restaurant";
 import { getSubscriptionStatus } from "@/lib/billing";
 import { TrialBanner } from "@/components/billing/trial-banner";
 
@@ -21,7 +24,10 @@ export default async function DashboardRootLayout({
     redirect("/login");
   }
 
-  const restaurant = await getRestaurantForUser();
+  let restaurant = await getRestaurantForUser();
+  if (!restaurant) {
+    restaurant = await ensureRestaurantForUser();
+  }
 
   // First-time owners must complete onboarding before using the dashboard.
   if (restaurant && !restaurant.onboarded) {

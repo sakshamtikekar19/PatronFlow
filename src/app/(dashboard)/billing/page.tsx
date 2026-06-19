@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { getBillingData, getActivePlans } from "@/lib/queries/billing";
 import { getSubscriptionStatus, getAvailableProviders } from "@/lib/billing";
 import { createClient } from "@/lib/supabase/server";
@@ -16,10 +16,10 @@ interface BillingPageProps {
 }
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
-  const restaurant = await getRestaurantForUser();
+  const restaurant = await ensureRestaurantForUser();
 
   if (!restaurant) {
-    redirect("/onboarding");
+    redirect("/login?error=restaurant_setup_failed");
   }
 
   const [billingData, plans, subscriptionStatus] = await Promise.all([

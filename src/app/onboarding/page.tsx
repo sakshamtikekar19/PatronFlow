@@ -1,14 +1,24 @@
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
-import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { createClient } from "@/lib/supabase/server";
+import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { getSubscriptionStatus } from "@/lib/billing";
 import { buildReviewUrl } from "@/lib/review-url";
 
 export default async function OnboardingPage() {
-  const restaurant = await getRestaurantForUser();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const restaurant = await ensureRestaurantForUser();
 
   if (!restaurant) {
-    redirect("/login");
+    redirect("/login?error=restaurant_setup_failed");
   }
 
   const subscriptionStatus = await getSubscriptionStatus(restaurant.id);
