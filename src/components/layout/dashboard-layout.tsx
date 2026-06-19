@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { BRAND } from "@/config/branding";
+import { ContactLinkInline } from "@/components/contact/contact-link-inline";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export function DashboardLayout({
         <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
           {children}
         </main>
-        <footer className="flex flex-col items-center gap-2 border-t border-border px-4 py-6 text-center lg:px-8">
+        <footer className="flex flex-col items-center gap-3 border-t border-border px-4 py-6 text-center lg:px-8">
           <Image
             src="/patronflowlogo.png"
             alt={BRAND.name}
@@ -44,6 +45,10 @@ export function DashboardLayout({
             className="h-6 w-auto"
           />
           <p className="text-xs text-muted-foreground">{BRAND.tagline}</p>
+          <ContactLinkInline
+            stacked={false}
+            linkClassName="text-muted-foreground hover:text-foreground"
+          />
           <nav className="flex items-center gap-3 text-xs text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground">
               Privacy Policy

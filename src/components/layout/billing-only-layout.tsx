@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/lib/actions/auth";
 import { BRAND } from "@/config/branding";
+import { ContactLinkInline } from "@/components/contact/contact-link-inline";
 
 interface BillingOnlyLayoutProps {
   children: React.ReactNode;
@@ -51,7 +52,11 @@ export function BillingOnlyLayout({
         </DropdownMenu>
       </header>
       <main className="mx-auto w-full max-w-6xl p-4 lg:p-8">{children}</main>
-      <footer className="flex flex-col items-center gap-2 border-t border-border px-4 py-6 text-center">
+      <footer className="flex flex-col items-center gap-3 border-t border-border px-4 py-6 text-center">
+        <ContactLinkInline
+          stacked={false}
+          linkClassName="text-muted-foreground hover:text-foreground"
+        />
         <nav className="flex items-center gap-3 text-xs text-muted-foreground">
           <Link href="/privacy" className="hover:text-foreground">
             Privacy Policy

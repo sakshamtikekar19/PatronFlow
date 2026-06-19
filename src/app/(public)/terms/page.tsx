@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BRAND } from "@/config/branding";
 import { BILLING_CONFIG } from "@/lib/billing/config";
+import { LegalContactSection } from "@/components/contact/legal-contact-section";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -261,6 +262,8 @@ export default function TermsOfServicePage() {
         If any provision of these Terms is found to be unenforceable, the remaining provisions will
         continue in full force and effect.
       </p>
+
+      <LegalContactSection />
     </article>
   );
 }

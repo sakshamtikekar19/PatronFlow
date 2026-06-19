@@ -1,28 +1,26 @@
 "use client";
 
+import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { WhatsAppIcon } from "./whatsapp-icon";
-import { WHATSAPP_URL, PRIMARY_CTA_LABEL } from "@/config/landing";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/branding";
 import { cn } from "@/lib/utils";
 
-interface WhatsAppCtaProps {
+interface EmailCtaProps {
   label?: string;
   size?: "default" | "lg";
   variant?: "primary" | "outline" | "inverse";
   className?: string;
 }
 
-export function WhatsAppCta({
-  label = PRIMARY_CTA_LABEL,
+export function EmailCta({
+  label = "Email us",
   size = "default",
-  variant = "primary",
+  variant = "outline",
   className,
-}: WhatsAppCtaProps) {
+}: EmailCtaProps) {
   return (
     <motion.a
-      href={WHATSAPP_URL}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={CONTACT_MAILTO}
       whileHover={{ y: -2 }}
       whileTap={{ y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 22 }}
@@ -38,13 +36,15 @@ export function WhatsAppCta({
         className
       )}
     >
-      <WhatsAppIcon
+      <Mail
         className={cn(
           size === "lg" ? "h-5 w-5" : "h-4 w-4",
-          variant === "primary" ? "text-[#25D366]" : "text-[#25D366]"
+          variant === "primary" ? "text-white" : "text-neutral-700"
         )}
+        aria-hidden
       />
       {label}
+      <span className="sr-only">{CONTACT_EMAIL}</span>
     </motion.a>
   );
 }

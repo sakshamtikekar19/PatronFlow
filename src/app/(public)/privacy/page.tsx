@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BRAND } from "@/config/branding";
+import { LegalContactSection } from "@/components/contact/legal-contact-section";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -112,6 +113,10 @@ export default function PrivacyPolicyPage() {
         <li>Object to or restrict certain processing</li>
         <li>Withdraw consent where applicable</li>
       </ul>
+      <p>
+        To exercise any of these rights, contact us using the details in the Contact
+        Us section below.
+      </p>
 
       <h3>6.2 India Digital Personal Data Protection (DPDP) Act</h3>
       <p>For users in India, in accordance with the DPDP Act 2023:</p>
@@ -157,6 +162,8 @@ export default function PrivacyPolicyPage() {
         the new Privacy Policy on this page and updating the &ldquo;Last updated&rdquo; date. You are advised
         to review this Privacy Policy periodically.
       </p>
+
+      <LegalContactSection />
     </article>
   );
 }

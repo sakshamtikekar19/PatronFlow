@@ -1,15 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/config/branding";
-import {
-  WHATSAPP_URL,
-  WHATSAPP_PHONE_DISPLAY,
-} from "@/config/landing";
-import { WhatsAppIcon } from "./whatsapp-icon";
+import { ContactLinkInline } from "@/components/contact/contact-link-inline";
 
 const FOOTER_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const LEGAL_LINKS = [
@@ -72,17 +69,12 @@ export function LandingFooter() {
 
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                WhatsApp
+                Contact
               </h4>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-900"
-              >
-                <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
-                {WHATSAPP_PHONE_DISPLAY}
-              </a>
+              <ContactLinkInline
+                className="mt-4"
+                linkClassName="text-neutral-700 hover:text-neutral-900"
+              />
             </div>
           </div>
         </div>

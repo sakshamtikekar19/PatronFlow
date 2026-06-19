@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, TrendingUp, Users } from "lucide-react";
 import { HERO, HERO_IMAGE } from "@/config/landing";
-import { WhatsAppCta } from "./whatsapp-cta";
+import { ContactCtaGroup } from "./contact-cta-group";
 
 const container = {
   hidden: {},
@@ -59,9 +59,14 @@ export function HeroSection() {
 
           <motion.div
             variants={item}
-            className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:items-start lg:justify-start sm:justify-center"
+            className="mt-8 flex flex-col items-center gap-4 lg:items-start"
           >
-            <WhatsAppCta size="lg" />
+            <ContactCtaGroup
+              size="lg"
+              className="w-full lg:justify-start"
+              whatsappLabel="Contact on WhatsApp"
+              emailLabel="Email us"
+            />
             <Link
               href="#features"
               className="group inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-8 text-base font-medium text-neutral-900 transition-colors hover:bg-neutral-50"

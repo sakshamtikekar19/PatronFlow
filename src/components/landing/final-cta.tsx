@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { WhatsAppCta } from "./whatsapp-cta";
-import { WHATSAPP_PHONE_DISPLAY } from "@/config/landing";
+import { ContactCtaGroup } from "./contact-cta-group";
+import { ContactLinkInline } from "@/components/contact/contact-link-inline";
 
 export function FinalCta() {
   return (
@@ -25,14 +25,17 @@ export function FinalCta() {
           See how PatronFlow can help increase reviews, improve guest
           experience, and drive repeat business.
         </p>
-        <div className="relative mt-9 flex flex-col items-center gap-4">
-          <WhatsAppCta size="lg" />
-          <p className="text-sm text-neutral-400">
-            Or message us directly at{" "}
-            <span className="font-medium text-neutral-200">
-              {WHATSAPP_PHONE_DISPLAY}
-            </span>
-          </p>
+        <div className="relative mt-9 flex flex-col items-center gap-6">
+          <ContactCtaGroup
+            size="lg"
+            theme="dark"
+            whatsappLabel="Chat on WhatsApp"
+            emailLabel="Email us"
+          />
+          <ContactLinkInline
+            stacked={false}
+            linkClassName="text-neutral-300 hover:text-white"
+          />
         </div>
       </motion.div>
     </section>
