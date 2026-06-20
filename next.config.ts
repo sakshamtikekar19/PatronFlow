@@ -3,11 +3,11 @@ import type { NextConfig } from "next";
 // Content Security Policy - adjust as needed for external resources
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://checkout.razorpay.com https://www.paypal.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://checkout.razorpay.com https://www.paypal.com https://www.googletagmanager.com;
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://*.supabase.co https://*.stripe.com https://*.razorpay.com https://cdn.razorpay.com;
+  img-src 'self' blob: data: https://*.supabase.co https://*.stripe.com https://*.razorpay.com https://cdn.razorpay.com https://www.google-analytics.com https://www.googletagmanager.com;
   font-src 'self';
-  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.razorpay.com https://lumberjack.razorpay.com https://checkout.razorpay.com https://api.paypal.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.razorpay.com https://lumberjack.razorpay.com https://checkout.razorpay.com https://api.paypal.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://*.google-analytics.com;
   frame-src https://js.stripe.com https://checkout.razorpay.com https://api.razorpay.com https://www.paypal.com;
   object-src 'none';
   base-uri 'self';
