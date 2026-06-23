@@ -9,6 +9,7 @@ import {
 } from "@/lib/queries/restaurant";
 import { getSubscriptionStatus } from "@/lib/billing";
 import { TrialBanner } from "@/components/billing/trial-banner";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function DashboardRootLayout({
   children,
@@ -42,6 +43,11 @@ export default async function DashboardRootLayout({
   let subscriptionStatus = null;
   let isLocked = false;
   if (restaurant) {
+    void createAdminClient()
+      .from("restaurants")
+      .update({ last_active_at: new Date().toISOString() })
+      .eq("id", restaurant.id);
+
     subscriptionStatus = await getSubscriptionStatus(restaurant.id);
     isLocked = !subscriptionStatus.isActive;
 

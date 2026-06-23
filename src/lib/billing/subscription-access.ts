@@ -33,7 +33,7 @@ export async function getUserAppAccess(userId: string) {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, onboarded, name, logo")
+    .select("id, onboarded, name, logo, is_suspended")
     .eq("owner_id", userId)
     .maybeSingle();
 
@@ -43,6 +43,17 @@ export async function getUserAppAccess(userId: string) {
       isActive: false,
       needsOnboarding: true,
       isLocked: false,
+      isSuspended: false,
+    };
+  }
+
+  if (restaurant.is_suspended) {
+    return {
+      restaurant,
+      isActive: false,
+      needsOnboarding: !restaurant.onboarded,
+      isLocked: true,
+      isSuspended: true,
     };
   }
 
@@ -61,5 +72,6 @@ export async function getUserAppAccess(userId: string) {
     isActive,
     needsOnboarding,
     isLocked,
+    isSuspended: false,
   };
 }

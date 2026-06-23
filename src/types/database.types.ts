@@ -25,6 +25,10 @@ export interface Restaurant {
   google_review_url: string | null;
   cuisine_type: string | null;
   onboarded: boolean;
+  is_suspended?: boolean;
+  suspended_at?: string | null;
+  suspended_reason?: string | null;
+  last_active_at?: string | null;
   created_at: string;
 }
 

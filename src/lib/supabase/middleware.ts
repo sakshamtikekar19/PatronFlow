@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getUserAppAccess } from "@/lib/billing/subscription-access";
+import { isSuperAdmin } from "@/lib/security/admin-access";
 import {
   isBillingApiRoute,
   isProtectedApiRoute,
@@ -68,6 +69,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/reset-password") ||
     pathname.startsWith("/privacy") ||
     pathname.startsWith("/terms");
+  const isAdminRoute = pathname.startsWith("/admin");
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/customers") ||
@@ -83,8 +85,25 @@ export async function updateSession(request: NextRequest) {
   const isBillingRoute = pathname.startsWith("/billing");
   const isOnboardingRoute = pathname.startsWith("/onboarding");
 
-  if (!user && isProtectedApiRoute(pathname)) {
+  if (!user && (isProtectedApiRoute(pathname) || isAdminRoute)) {
+    if (isAdminRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("error", "admin_forbidden");
+      return NextResponse.redirect(url);
+    }
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (user && isAdminRoute && !isSuperAdmin(user)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  if (user && isAdminRoute && isSuperAdmin(user)) {
+    supabaseResponse.headers.set("x-pathname", pathname);
+    return supabaseResponse;
   }
 
   if (user && isProtectedApiRoute(pathname)) {
@@ -124,6 +143,22 @@ export async function updateSession(request: NextRequest) {
         const url = request.nextUrl.clone();
         url.pathname = "/onboarding";
         return NextResponse.redirect(url);
+      }
+
+      if (access.isSuspended) {
+        const allowedWhileSuspended =
+          isPublicRoute ||
+          pathname.startsWith("/auth/") ||
+          pathname === "/forgot-password" ||
+          pathname === "/reset-password" ||
+          pathname === "/login";
+
+        if (!allowedWhileSuspended) {
+          const url = request.nextUrl.clone();
+          url.pathname = "/login";
+          url.searchParams.set("error", "account_suspended");
+          return NextResponse.redirect(url);
+        }
       }
 
       if (subscriptionInactive) {
