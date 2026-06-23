@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { getPostLoginPath } from "@/lib/security/admin-access";
+
+async function resolveRedirectPath(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  fallback: string
+): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user ? getPostLoginPath(user) : fallback;
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -24,7 +35,9 @@ export async function GET(request: Request) {
       if (type === "recovery") {
         return NextResponse.redirect(`${origin}/reset-password`);
       }
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(
+        `${origin}${await resolveRedirectPath(supabase, next)}`
+      );
     }
     // Recovery link failed - redirect to reset-password with error
     if (type === "recovery") {
@@ -40,7 +53,9 @@ export async function GET(request: Request) {
       if (next === "/reset-password") {
         return NextResponse.redirect(`${origin}/reset-password`);
       }
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(
+        `${origin}${await resolveRedirectPath(supabase, next)}`
+      );
     }
     // Recovery link failed
     if (next === "/reset-password") {

@@ -106,6 +106,12 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  if (user && isSuperAdmin(user) && isProtectedRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin";
+    return NextResponse.redirect(url);
+  }
+
   if (user && isProtectedApiRoute(pathname)) {
     const ip = getClientIpFromRequest(request);
     const rateLimit = await checkRateLimit(
@@ -192,6 +198,10 @@ export async function updateSession(request: NextRequest) {
 
       if (isAuthRoute) {
         const url = request.nextUrl.clone();
+        if (isSuperAdmin(user)) {
+          url.pathname = "/admin";
+          return NextResponse.redirect(url);
+        }
         url.pathname = subscriptionInactive
           ? "/billing"
           : access.needsOnboarding

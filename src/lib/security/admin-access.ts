@@ -22,3 +22,7 @@ export function isSuperAdmin(user: User | null): boolean {
     user.email && allowlist.includes(user.email.toLowerCase())
   );
 }
+
+export function getPostLoginPath(user: User): string {
+  return isSuperAdmin(user) ? "/admin" : "/dashboard";
+}

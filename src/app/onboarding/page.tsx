@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { getSubscriptionStatus } from "@/lib/billing";
 import { buildReviewUrl } from "@/lib/review-url";
+import { isSuperAdmin } from "@/lib/security/admin-access";
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
@@ -13,6 +14,10 @@ export default async function OnboardingPage() {
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (isSuperAdmin(user)) {
+    redirect("/admin");
   }
 
   const restaurant = await ensureRestaurantForUser();

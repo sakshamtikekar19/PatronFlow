@@ -10,6 +10,7 @@ import {
 import { getSubscriptionStatus } from "@/lib/billing";
 import { TrialBanner } from "@/components/billing/trial-banner";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isSuperAdmin } from "@/lib/security/admin-access";
 
 export default async function DashboardRootLayout({
   children,
@@ -23,6 +24,10 @@ export default async function DashboardRootLayout({
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (isSuperAdmin(user)) {
+    redirect("/admin");
   }
 
   let restaurant = await getRestaurantForUser();

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isSuperAdmin } from "@/lib/security/admin-access";
 import type { Restaurant } from "@/types";
 
 export async function getRestaurantForUser(): Promise<Restaurant | null> {
@@ -36,6 +37,8 @@ export async function ensureRestaurantForUser(): Promise<Restaurant | null> {
   } = await supabase.auth.getUser();
 
   if (!user) return null;
+
+  if (isSuperAdmin(user)) return null;
 
   const admin = createAdminClient();
   const name =

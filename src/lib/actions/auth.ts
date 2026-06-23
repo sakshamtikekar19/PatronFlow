@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getPostLoginPath } from "@/lib/security/admin-access";
 
 export interface AuthResult {
   error?: string;
@@ -32,8 +33,12 @@ export async function login(
     return { error: error.message };
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(user ? getPostLoginPath(user) : "/dashboard");
 }
 
 export async function signup(
