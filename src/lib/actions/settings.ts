@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cancelSubscriptionForAccountDeletion } from "@/lib/billing";
 import { requireActiveSubscription } from "@/lib/billing/guards";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface SettingsFormData {
   name: string;
@@ -39,6 +40,8 @@ export async function updateRestaurantSettings(
     return { error: "Not authenticated" };
   }
 
+  const restaurant = await getRestaurantForUser();
+
   // Note: logo is handled separately via uploadRestaurantLogo so it is not
   // overwritten when saving text fields.
   const { error } = await supabase
@@ -53,6 +56,18 @@ export async function updateRestaurantSettings(
   if (error) {
     return { error: error.message };
   }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "restaurant.settings_update",
+    entityType: "restaurant",
+    entityId: restaurant?.id,
+    metadata: {
+      name: data.name,
+      cuisine_type: data.cuisine_type ?? null,
+    },
+  });
 
   revalidatePath("/settings");
   revalidatePath("/dashboard");
@@ -129,6 +144,14 @@ export async function uploadRestaurantLogo(
     return { error: updateError.message };
   }
 
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "restaurant.logo_upload",
+    entityType: "restaurant",
+    entityId: restaurant.id,
+  });
+
   revalidatePath("/settings");
   revalidatePath("/dashboard");
   return { logoUrl: publicUrl };
@@ -162,6 +185,18 @@ export async function deleteAccount(): Promise<{ error?: string }> {
       };
     }
   }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "account.delete",
+    entityType: "user",
+    entityId: user.id,
+    metadata: {
+      restaurantId: restaurant?.id ?? null,
+      restaurantName: restaurant?.name ?? null,
+    },
+  });
 
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.deleteUser(user.id);
@@ -199,6 +234,15 @@ export async function removeRestaurantLogo(): Promise<{
   if (error) {
     return { error: error.message };
   }
+
+  const restaurant = await getRestaurantForUser();
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "restaurant.logo_remove",
+    entityType: "restaurant",
+    entityId: restaurant?.id,
+  });
 
   revalidatePath("/settings");
   revalidatePath("/dashboard");

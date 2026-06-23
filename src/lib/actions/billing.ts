@@ -5,6 +5,7 @@ import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { createClient } from "@/lib/supabase/server";
 import { startCheckout, getPortalUrl, cancelSubscription } from "@/lib/billing";
 import type { BillingProvider } from "@/lib/billing";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export async function createCheckout(
   provider: BillingProvider
@@ -45,6 +46,15 @@ export async function createCheckout(
       return { error: "Razorpay publishable key is not configured" };
     }
 
+    await writeAuditLog({
+      actorId: user.id,
+      actorEmail: user.email,
+      action: "subscription.checkout_started",
+      entityType: "restaurant",
+      entityId: restaurant.id,
+      metadata: { provider },
+    });
+
     return {
       razorpaySubscriptionId: result.subscriptionId,
       razorpayKey,
@@ -52,6 +62,14 @@ export async function createCheckout(
   }
 
   if (result.url) {
+    await writeAuditLog({
+      actorId: user.id,
+      actorEmail: user.email,
+      action: "subscription.checkout_started",
+      entityType: "restaurant",
+      entityId: restaurant.id,
+      metadata: { provider },
+    });
     redirect(result.url);
   }
 
@@ -87,6 +105,19 @@ export async function cancelCurrentSubscription(): Promise<{
   const result = await cancelSubscription(restaurant.id, true);
 
   if (result.success) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    await writeAuditLog({
+      actorId: user?.id,
+      actorEmail: user?.email,
+      action: "subscription.cancel_requested",
+      entityType: "restaurant",
+      entityId: restaurant.id,
+    });
+
     return { success: true };
   }
 

@@ -20,6 +20,7 @@ import {
   Download,
   ArrowRight,
   LogOut,
+  LifeBuoy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ import {
 } from "@/lib/actions/settings";
 import { logout } from "@/lib/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SupportReportForm } from "@/components/settings/support-report-form";
 import { printQrPoster, downloadQrPoster } from "@/lib/print-poster";
 import { CUISINE_TYPES } from "@/types";
 import { cn } from "@/lib/utils";
@@ -73,6 +75,7 @@ const TABS = [
   { id: "brand", label: "Brand", icon: Palette },
   { id: "qr", label: "QR", icon: QrCode },
   { id: "account", label: "Account", icon: User },
+  { id: "support", label: "Support", icon: LifeBuoy },
   { id: "danger", label: "Danger Zone", icon: AlertTriangle },
 ] as const;
 
@@ -409,6 +412,15 @@ export function SettingsTabs({
               </Button>
             </form>
           </div>
+        )}
+
+        {/* Support */}
+        {tab === "support" && (
+          <SupportReportForm
+            restaurantId={restaurant.id}
+            restaurantName={restaurant.name}
+            userEmail={userEmail}
+          />
         )}
 
         {/* Danger Zone */}

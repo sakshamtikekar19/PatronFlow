@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPostLoginPath } from "@/lib/security/admin-access";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface AuthResult {
   error?: string;
@@ -89,6 +90,17 @@ export async function signup(
       message:
         "Account created. Check your email to confirm your address, then sign in.",
     };
+  }
+
+  if (data.user) {
+    await writeAuditLog({
+      actorId: data.user.id,
+      actorEmail: data.user.email,
+      action: "account.signup",
+      entityType: "user",
+      entityId: data.user.id,
+      metadata: { restaurantName: restaurantName.trim() },
+    });
   }
 
   revalidatePath("/", "layout");

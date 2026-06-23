@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cancelSubscriptionForAccountDeletion } from "@/lib/billing";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface DataExportResult {
   success?: boolean;
@@ -126,6 +127,14 @@ export async function exportUserData(): Promise<DataExportResult> {
     new Date().toISOString().split("T")[0]
   }.json`;
 
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "account.data_export",
+    entityType: "restaurant",
+    entityId: restaurant.id,
+  });
+
   return {
     success: true,
     data: JSON.stringify(exportData, null, 2),
@@ -159,6 +168,19 @@ export async function deleteUserData(): Promise<{ error?: string }> {
         "Could not cancel your subscription. Cancel billing first or contact support.",
     };
   }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "account.delete",
+    entityType: "user",
+    entityId: user.id,
+    metadata: {
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+      source: "data_requests",
+    },
+  });
 
   // Use admin client to delete the user (this cascades to restaurant and all related data)
   const adminSupabase = createAdminClient();

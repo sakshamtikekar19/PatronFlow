@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { updateSubscriptionStatus, recordPayment } from "@/lib/billing";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface RazorpaySubscriptionEntity {
   id: string;
@@ -103,6 +104,13 @@ export async function handleSubscriptionActive(
     .from("subscriptions")
     .update(periodUpdateFields(subscription))
     .eq("restaurant_id", restaurantId);
+
+  await writeAuditLog({
+    action: "billing.subscription_activated",
+    entityType: "restaurant",
+    entityId: restaurantId,
+    metadata: { provider: "razorpay", subscriptionId: subscription.id },
+  });
 }
 
 export async function handleSubscriptionCharged(
@@ -135,6 +143,18 @@ export async function handleSubscriptionCharged(
       status: "paid",
     });
   }
+
+  await writeAuditLog({
+    action: "billing.payment_received",
+    entityType: "restaurant",
+    entityId: restaurantId,
+    metadata: {
+      provider: "razorpay",
+      paymentId: payment.id,
+      amount: payment.amount,
+      currency: payment.currency,
+    },
+  });
 }
 
 export async function handlePaymentFailed(
@@ -168,6 +188,17 @@ export async function handlePaymentFailed(
       failureReason: payment.error_description,
     });
   }
+
+  await writeAuditLog({
+    action: "billing.payment_failed",
+    entityType: "restaurant",
+    entityId: restaurantId,
+    metadata: {
+      provider: "razorpay",
+      paymentId: payment.id,
+      reason: payment.error_description,
+    },
+  });
 }
 
 export async function processRazorpayWebhookEvent(
@@ -212,6 +243,16 @@ export async function processRazorpayWebhookEvent(
         if (restaurantId) {
           await updateSubscriptionStatus(restaurantId, "cancelled", {
             cancelled_at: new Date().toISOString(),
+          });
+          await writeAuditLog({
+            action: "billing.subscription_cancelled",
+            entityType: "restaurant",
+            entityId: restaurantId,
+            metadata: {
+              provider: "razorpay",
+              event: event.event,
+              subscriptionId: subscription.id,
+            },
           });
         }
       }

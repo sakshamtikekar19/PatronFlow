@@ -170,7 +170,7 @@ export async function impersonateRestaurantOwner(
   return { url: linkData.properties.action_link };
 }
 
-export async function updateSupportRequestStatus(
+export async function updateSupportRequest(
   requestId: string,
   status: "open" | "in_progress" | "resolved" | "closed",
   adminNotes?: string
@@ -192,14 +192,23 @@ export async function updateSupportRequestStatus(
   await writeAuditLog({
     actorId: actor.id,
     actorEmail: actor.email,
-    action: "support.update_status",
+    action: "support.update",
     entityType: "support_request",
     entityId: requestId,
-    metadata: { status },
+    metadata: { status, hasNotes: Boolean(adminNotes?.trim()) },
   });
 
   revalidatePath("/admin/support");
   return {};
+}
+
+/** @deprecated Use updateSupportRequest */
+export async function updateSupportRequestStatus(
+  requestId: string,
+  status: "open" | "in_progress" | "resolved" | "closed",
+  adminNotes?: string
+): Promise<{ error?: string }> {
+  return updateSupportRequest(requestId, status, adminNotes);
 }
 
 export async function logoutToAdmin() {

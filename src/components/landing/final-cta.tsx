@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ContactCtaGroup } from "./contact-cta-group";
 import { ContactLinkInline } from "@/components/contact/contact-link-inline";
+import { ContactForm } from "@/components/contact/contact-form";
 
 export function FinalCta() {
   return (
@@ -37,6 +38,8 @@ export function FinalCta() {
             linkClassName="text-neutral-300 hover:text-white"
           />
         </div>
+
+        <ContactForm />
       </motion.div>
     </section>
   );

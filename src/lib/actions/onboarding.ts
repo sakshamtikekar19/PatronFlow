@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { generateUniqueRestaurantSlug } from "@/lib/slug";
 import { requireActiveSubscription } from "@/lib/billing/guards";
+import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface OnboardingData {
   name: string;
@@ -84,6 +85,20 @@ export async function completeOnboarding(): Promise<{
     .eq("owner_id", user.id);
 
   if (error) return { error: error.message };
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single();
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorEmail: user.email,
+    action: "restaurant.onboarding_complete",
+    entityType: "restaurant",
+    entityId: restaurant?.id,
+  });
 
   revalidatePath("/", "layout");
   return { success: true };
