@@ -114,15 +114,22 @@ export async function checkRateLimit(
   namespace = "default"
 ): Promise<RateLimitResult> {
   if (isUpstashConfigured()) {
-    const limiter = getUpstashLimiter(config, namespace);
-    const result = await limiter.limit(identifier);
+    try {
+      const limiter = getUpstashLimiter(config, namespace);
+      const result = await limiter.limit(identifier);
 
-    return {
-      success: result.success,
-      limit: result.limit,
-      remaining: result.remaining,
-      reset: result.reset,
-    };
+      return {
+        success: result.success,
+        limit: result.limit,
+        remaining: result.remaining,
+        reset: result.reset,
+      };
+    } catch (error) {
+      console.error(
+        "Upstash rate limit failed; falling back to in-memory limiter:",
+        error
+      );
+    }
   }
 
   return checkMemoryRateLimit(`${namespace}:${identifier}`, config);
@@ -154,21 +161,25 @@ export function getClientIpFromRequest(request: NextRequest): string {
  * Get client IP address from Next.js request headers.
  */
 export async function getClientIp(): Promise<string> {
-  const headersList = await headers();
+  try {
+    const headersList = await headers();
 
-  const forwardedFor = headersList.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim();
-  }
+    const forwardedFor = headersList.get("x-forwarded-for");
+    if (forwardedFor) {
+      return forwardedFor.split(",")[0].trim();
+    }
 
-  const realIp = headersList.get("x-real-ip");
-  if (realIp) {
-    return realIp;
-  }
+    const realIp = headersList.get("x-real-ip");
+    if (realIp) {
+      return realIp;
+    }
 
-  const vercelForwardedFor = headersList.get("x-vercel-forwarded-for");
-  if (vercelForwardedFor) {
-    return vercelForwardedFor.split(",")[0].trim();
+    const vercelForwardedFor = headersList.get("x-vercel-forwarded-for");
+    if (vercelForwardedFor) {
+      return vercelForwardedFor.split(",")[0].trim();
+    }
+  } catch (error) {
+    console.error("Failed to read client IP from headers:", error);
   }
 
   return "unknown";

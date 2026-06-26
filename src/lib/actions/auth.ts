@@ -35,33 +35,53 @@ export async function login(
   _prevState: AuthResult,
   formData: FormData
 ): Promise<AuthResult> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return { error: "Email and password are required" };
+    if (!email || !password) {
+      return { error: "Email and password are required" };
+    }
+
+    const rateLimited = await enforceAuthRateLimit(
+      email,
+      rateLimiters.auth,
+      "auth-login"
+    );
+    if (rateLimited) return rateLimited;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    revalidatePath("/", "layout");
+    redirect(user ? getPostLoginPath(user) : "/dashboard");
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+
+    console.error("Login failed:", error);
+    return {
+      error: "Something went wrong while signing in. Please try again.",
+    };
   }
-
-  const rateLimited = await enforceAuthRateLimit(email, rateLimiters.auth, "auth-login");
-  if (rateLimited) return rateLimited;
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  revalidatePath("/", "layout");
-  redirect(user ? getPostLoginPath(user) : "/dashboard");
 }
 
 export async function signup(

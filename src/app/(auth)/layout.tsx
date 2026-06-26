@@ -27,7 +27,7 @@ export default function AuthLayout({
           <ContactLinkInline
             linkClassName="justify-center text-neutral-600 hover:text-neutral-900"
           />
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-neutral-400" suppressHydrationWarning>
             © {new Date().getFullYear()} {BRAND.name}. {BRAND.category}.
           </p>
         </footer>
