@@ -16,11 +16,13 @@ export const NAV_LINKS = [
   { label: "Pricing", href: "#pricing" },
 ] as const;
 
-/** Public landing pricing — keep in sync with BILLING_CONFIG / Razorpay plan */
+/** Public landing pricing — keep in sync with BILLING_CONFIG / Razorpay plans */
 export const PRICING = {
   planName: "PatronFlow Pro",
   priceInr: 4999,
+  priceUsd: 99,
   priceDisplay: "₹4,999",
+  priceDisplayUsd: "$99",
   period: "month",
   trialDays: 30,
   tagline: "Everything you need to grow reviews, loyalty, and repeat visits.",

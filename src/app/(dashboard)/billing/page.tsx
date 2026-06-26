@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { ensureRestaurantForUser } from "@/lib/queries/restaurant";
 import { getBillingData, getActivePlans } from "@/lib/queries/billing";
 import { getSubscriptionStatus, getAvailableProviders } from "@/lib/billing";
+import {
+  getCountryFromHeaders,
+  resolveSubscriptionCurrency,
+} from "@/lib/billing/subscription-currency";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/page-header";
 import { BillingPageClient } from "@/components/billing/billing-page-client";
@@ -12,7 +17,11 @@ export const metadata: Metadata = {
 };
 
 interface BillingPageProps {
-  searchParams: Promise<{ success?: string; cancelled?: string }>;
+  searchParams: Promise<{
+    success?: string;
+    cancelled?: string;
+    currency?: string;
+  }>;
 }
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
@@ -35,6 +44,11 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   const availableProviders = getAvailableProviders();
   const params = await searchParams;
+  const headersList = await headers();
+  const checkoutCurrency = resolveSubscriptionCurrency({
+    countryCode: getCountryFromHeaders(headersList),
+    currencyOverride: params.currency,
+  });
 
   return (
     <div className="space-y-6">
@@ -73,6 +87,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         plans={plans}
         subscriptionStatus={subscriptionStatus}
         availableProviders={availableProviders}
+        checkoutCurrency={checkoutCurrency}
         userEmail={user?.email ?? ""}
         restaurantName={restaurant.name}
       />

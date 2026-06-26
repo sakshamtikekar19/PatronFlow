@@ -22,9 +22,9 @@ const providerConfig: Record<
     description: "Pay with credit or debit card",
   },
   razorpay: {
-    name: "UPI / Cards",
+    name: "Razorpay",
     icon: Smartphone,
-    description: "Pay with UPI, cards, or net banking",
+    description: "Cards, UPI (India), and international payments",
   },
   paypal: {
     name: "PayPal",

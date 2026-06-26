@@ -12,6 +12,11 @@ import { createRazorpaySubscription, cancelRazorpaySubscription } from "@/lib/ra
 import type { Subscription, SubscriptionStatus, PaymentProvider } from "@/types/database.types";
 import { isInGracePeriod } from "./config";
 import { getTrialDaysRemaining } from "./trial";
+import {
+  isRazorpayCurrencyConfigured,
+  resolveSubscriptionCurrency,
+  type SubscriptionCurrency,
+} from "./subscription-currency";
 
 export type BillingProvider = "stripe" | "razorpay" | "paypal";
 
@@ -19,17 +24,25 @@ export type BillingProvider = "stripe" | "razorpay" | "paypal";
  * Detect the best payment provider based on region
  */
 export function detectProvider(countryCode?: string): BillingProvider {
-  // India uses Razorpay for UPI support
-  if (countryCode === "IN" && isRazorpayConfigured()) {
+  // India uses Razorpay INR plan
+  if (
+    countryCode === "IN" &&
+    isRazorpayConfigured() &&
+    isRazorpayCurrencyConfigured("INR")
+  ) {
     return "razorpay";
   }
 
-  // International uses Stripe
+  // International Razorpay USD when configured
+  if (isRazorpayConfigured() && isRazorpayCurrencyConfigured("USD")) {
+    return "razorpay";
+  }
+
+  // Stripe fallback for international when USD Razorpay plan is not set
   if (isStripeConfigured()) {
     return "stripe";
   }
 
-  // Fallback to Razorpay if Stripe not configured
   if (isRazorpayConfigured()) {
     return "razorpay";
   }
@@ -150,6 +163,8 @@ export async function startCheckout(params: {
   cancelUrl: string;
   phone?: string;
   name?: string;
+  countryCode?: string | null;
+  currencyOverride?: string | null;
 }): Promise<{ url: string | null; subscriptionId?: string; error?: string }> {
   if (params.provider === "stripe") {
     return createCheckoutSession({
@@ -161,11 +176,17 @@ export async function startCheckout(params: {
   }
 
   if (params.provider === "razorpay") {
+    const currency: SubscriptionCurrency = resolveSubscriptionCurrency({
+      countryCode: params.countryCode,
+      currencyOverride: params.currencyOverride,
+    });
+
     const result = await createRazorpaySubscription({
       restaurantId: params.restaurantId,
       email: params.email,
       phone: params.phone,
       name: params.name,
+      currency,
     });
 
     if (result.subscriptionId) {

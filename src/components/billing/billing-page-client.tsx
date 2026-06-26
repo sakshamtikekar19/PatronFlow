@@ -8,7 +8,9 @@ import { PaymentMethodSelector } from "./payment-method-selector";
 import { InvoiceHistory } from "./invoice-history";
 import { createCheckout, openBillingPortal, cancelCurrentSubscription } from "@/lib/actions/billing";
 import { openRazorpaySubscriptionCheckout } from "@/components/billing/razorpay-checkout";
-import { formatPrice, BILLING_CONFIG } from "@/lib/billing/config";
+import { BILLING_CONFIG } from "@/lib/billing/config";
+import { formatSubscriptionPrice } from "@/lib/billing/subscription-currency";
+import type { SubscriptionCurrency } from "@/lib/billing/subscription-currency";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import type { Subscription, Payment, Plan, SubscriptionStatus as SubStatusType } from "@/types/database.types";
@@ -26,6 +28,7 @@ interface BillingPageClientProps {
     subscription: Subscription | null;
   };
   availableProviders: BillingProvider[];
+  checkoutCurrency: SubscriptionCurrency;
   userEmail: string;
   restaurantName: string;
 }
@@ -37,6 +40,7 @@ export function BillingPageClient({
   plans,
   subscriptionStatus,
   availableProviders,
+  checkoutCurrency,
   userEmail,
   restaurantName,
 }: BillingPageClientProps) {
@@ -51,6 +55,8 @@ export function BillingPageClient({
       try {
         const res = await fetch("/api/billing/razorpay-checkout", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ currency: checkoutCurrency.toLowerCase() }),
         });
         const data = (await res.json()) as {
           subscriptionId?: string;
@@ -241,10 +247,15 @@ export function BillingPageClient({
           </h3>
           <div className="mt-2">
             <span className="text-3xl font-bold text-foreground">
-              {formatPrice(currentPlan?.price_monthly_inr || 0, "INR")}
+              {formatSubscriptionPrice(checkoutCurrency)}
             </span>
             <span className="text-muted-foreground">/month</span>
           </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {checkoutCurrency === "INR"
+              ? "India pricing (₹4,999/month)"
+              : "International pricing ($99/month)"}
+          </p>
           <p className="mt-2 text-sm text-muted-foreground">
             {currentPlan?.description ||
               "All features included. No hidden fees."}

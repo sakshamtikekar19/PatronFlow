@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantForUser } from "@/lib/queries/restaurant";
 import { createRazorpaySubscription } from "@/lib/razorpay/subscription";
+import {
+  getCountryFromHeaders,
+  resolveSubscriptionCurrency,
+} from "@/lib/billing/subscription-currency";
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,21 +31,40 @@ export async function POST() {
     );
   }
 
+  let currencyOverride: string | null = null;
+  try {
+    const body = (await request.json()) as { currency?: string } | null;
+    currencyOverride = body?.currency ?? null;
+  } catch {
+    // Empty body is valid — currency is resolved from geo headers
+  }
+
+  const countryCode = getCountryFromHeaders(request.headers);
+  const currency = resolveSubscriptionCurrency({ countryCode, currencyOverride });
+
   const result = await createRazorpaySubscription({
     restaurantId: restaurant.id,
     email: user.email,
     name: restaurant.name,
+    currency,
   });
 
   if (!result.subscriptionId) {
-    return NextResponse.json(
-      { error: result.error || "Failed to create subscription" },
-      { status: 500 }
-    );
+    const message =
+      result.error ||
+      "We couldn't start your subscription. Please try again or contact support.";
+    console.error("Razorpay checkout failed:", {
+      currency,
+      countryCode,
+      restaurantId: restaurant.id,
+      error: result.error,
+    });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
   return NextResponse.json({
     subscriptionId: result.subscriptionId,
     key: razorpayKey,
+    currency,
   });
 }

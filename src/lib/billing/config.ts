@@ -23,7 +23,7 @@ export const BILLING_CONFIG = {
       name: "PatronFlow Pro",
       description: "All-inclusive plan with unlimited features",
       priceINR: 499900, // ₹4,999/month in paise
-      priceUSD: 0, // Configure when Stripe launches internationally
+      priceUSD: 9900, // $99/month in cents
       features: [
         "Unlimited feedback collection",
         "Customer database & visit tracking",

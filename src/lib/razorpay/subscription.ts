@@ -1,5 +1,9 @@
 import { getRazorpayClient } from "./client";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  getRazorpayPlanId,
+  type SubscriptionCurrency,
+} from "@/lib/billing/subscription-currency";
 import crypto from "crypto";
 
 interface CreateRazorpaySubscriptionParams {
@@ -7,6 +11,8 @@ interface CreateRazorpaySubscriptionParams {
   email: string;
   phone?: string;
   name?: string;
+  /** Defaults to INR for backward compatibility with existing callers */
+  currency?: SubscriptionCurrency;
 }
 
 interface RazorpaySubscriptionResult {
@@ -24,6 +30,7 @@ export async function createRazorpaySubscription({
   email,
   phone,
   name,
+  currency = "INR",
 }: CreateRazorpaySubscriptionParams): Promise<RazorpaySubscriptionResult> {
   const razorpay = getRazorpayClient();
 
@@ -36,13 +43,18 @@ export async function createRazorpaySubscription({
     };
   }
 
-  const planId = process.env.RAZORPAY_PLAN_ID;
+  const planId = getRazorpayPlanId(currency);
   if (!planId) {
+    const message =
+      currency === "INR"
+        ? "INR subscription plan is not configured. Set RAZORPAY_PLAN_INR or RAZORPAY_PLAN_ID."
+        : "USD subscription plan is not configured. Set RAZORPAY_PLAN_USD.";
+    console.error("Razorpay plan missing:", { currency, restaurantId });
     return {
       subscriptionId: null,
       customerId: null,
       shortUrl: null,
-      error: "Razorpay plan ID is not configured",
+      error: message,
     };
   }
 
@@ -115,7 +127,7 @@ export async function createRazorpaySubscription({
         notify_email: email,
         notify_phone: phone || undefined,
       },
-      notes: { restaurant_id: restaurantId },
+      notes: { restaurant_id: restaurantId, currency },
     } as Parameters<typeof razorpay.subscriptions.create>[0]);
 
     await supabase
@@ -132,7 +144,11 @@ export async function createRazorpaySubscription({
       shortUrl: razorpaySubscription.short_url ?? null,
     };
   } catch (error) {
-    console.error("Failed to create Razorpay subscription:", error);
+    console.error("Failed to create Razorpay subscription:", {
+      currency,
+      restaurantId,
+      error,
+    });
     return {
       subscriptionId: null,
       customerId: null,

@@ -26,6 +26,8 @@ const serverSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().optional(),
   RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
   RAZORPAY_PLAN_ID: z.string().optional(),
+  RAZORPAY_PLAN_INR: z.string().optional(),
+  RAZORPAY_PLAN_USD: z.string().optional(),
 
   // PayPal (optional until billing is enabled)
   PAYPAL_CLIENT_ID: z.string().optional(),

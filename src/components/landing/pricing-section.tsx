@@ -14,7 +14,7 @@ export function PricingSection() {
         <SectionHeading
           eyebrow="Pricing"
           title="One Plan. Every Feature."
-          description="Simple pricing for Indian restaurants — start with a free trial, then one flat monthly fee."
+          description="Simple pricing for restaurants worldwide — start with a free trial, then one flat monthly fee."
         />
 
         <motion.div
@@ -42,13 +42,29 @@ export function PricingSection() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
-                  {PRICING.priceDisplay}
-                  <span className="text-lg font-medium text-neutral-500">
-                    /{PRICING.period}
-                  </span>
-                </p>
-                <p className="mt-1 text-sm text-neutral-500">
+                <div className="space-y-1">
+                  <p className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
+                    {PRICING.priceDisplay}
+                    <span className="text-lg font-medium text-neutral-500">
+                      /{PRICING.period}
+                    </span>
+                  </p>
+                  <p className="text-sm font-medium text-neutral-600">
+                    India
+                  </p>
+                </div>
+                <div className="mt-4 space-y-1 border-t border-neutral-100 pt-4">
+                  <p className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+                    {PRICING.priceDisplayUsd}
+                    <span className="text-base font-medium text-neutral-500">
+                      /{PRICING.period}
+                    </span>
+                  </p>
+                  <p className="text-sm font-medium text-neutral-600">
+                    International
+                  </p>
+                </div>
+                <p className="mt-3 text-sm text-neutral-500">
                   {BILLING_CONFIG.trialDays}-day free trial included
                 </p>
               </div>
