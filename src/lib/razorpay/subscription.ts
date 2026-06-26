@@ -22,6 +22,17 @@ interface RazorpaySubscriptionResult {
   error?: string;
 }
 
+function getRazorpayErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "error" in error) {
+    const razorpayError = (error as { error?: { description?: string; reason?: string } })
+      .error;
+    if (razorpayError?.description) return razorpayError.description;
+    if (razorpayError?.reason) return razorpayError.reason;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return "Failed to create subscription";
+}
+
 /**
  * Create a Razorpay subscription
  */
@@ -69,6 +80,22 @@ export async function createRazorpaySubscription({
   let customerId = existingSub?.provider_customer_id ?? null;
 
   try {
+    if (customerId) {
+      try {
+        await razorpay.customers.fetch(customerId);
+      } catch {
+        console.warn("Stale Razorpay customer id, creating a new customer:", {
+          restaurantId,
+          customerId,
+        });
+        customerId = null;
+        await supabase
+          .from("subscriptions")
+          .update({ provider_customer_id: null })
+          .eq("restaurant_id", restaurantId);
+      }
+    }
+
     if (!customerId) {
       const customer = await razorpay.customers.create({
         email,
@@ -87,31 +114,44 @@ export async function createRazorpaySubscription({
         .eq("restaurant_id", restaurantId);
     }
 
-    // Reuse a pending subscription only if checkout is still valid
+    // Reuse a pending subscription only if checkout is still valid and plan matches
     if (existingSub?.provider_subscription_id) {
-      const existing = await razorpay.subscriptions.fetch(
-        existingSub.provider_subscription_id
-      );
-      const now = Math.floor(Date.now() / 1000);
-      const expireBy = (existing as { expire_by?: number }).expire_by;
-      const isExpired = typeof expireBy === "number" && expireBy < now;
-      const isPending = existing.status === "created" && !isExpired;
+      try {
+        const existing = await razorpay.subscriptions.fetch(
+          existingSub.provider_subscription_id
+        );
+        const existingPlanId = (existing as { plan_id?: string }).plan_id;
+        const now = Math.floor(Date.now() / 1000);
+        const expireBy = (existing as { expire_by?: number }).expire_by;
+        const isExpired = typeof expireBy === "number" && expireBy < now;
+        const isPending =
+          existing.status === "created" && !isExpired && existingPlanId === planId;
 
-      if (isPending) {
-        return {
-          subscriptionId: existing.id,
-          customerId,
-          shortUrl: existing.short_url ?? null,
-        };
-      }
-
-      // Cancel expired checkout attempts before creating a new subscription
-      if (isExpired && existing.status === "created") {
-        try {
-          await razorpay.subscriptions.cancel(existing.id, false);
-        } catch {
-          // Continue and create a new subscription
+        if (isPending) {
+          return {
+            subscriptionId: existing.id,
+            customerId,
+            shortUrl: existing.short_url ?? null,
+          };
         }
+
+        // Cancel stale checkout attempts before creating a new subscription
+        if (existing.status === "created") {
+          try {
+            await razorpay.subscriptions.cancel(existing.id, false);
+          } catch {
+            // Continue and create a new subscription
+          }
+        }
+      } catch {
+        console.warn("Stale Razorpay subscription id, creating a new one:", {
+          restaurantId,
+          providerSubscriptionId: existingSub.provider_subscription_id,
+        });
+        await supabase
+          .from("subscriptions")
+          .update({ provider_subscription_id: null })
+          .eq("restaurant_id", restaurantId);
       }
     }
 
@@ -144,16 +184,19 @@ export async function createRazorpaySubscription({
       shortUrl: razorpaySubscription.short_url ?? null,
     };
   } catch (error) {
+    const message = getRazorpayErrorMessage(error);
     console.error("Failed to create Razorpay subscription:", {
       currency,
       restaurantId,
+      planId,
       error,
+      message,
     });
     return {
       subscriptionId: null,
       customerId: null,
       shortUrl: null,
-      error: error instanceof Error ? error.message : "Failed to create subscription",
+      error: message,
     };
   }
 }
