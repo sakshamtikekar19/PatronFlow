@@ -33,6 +33,68 @@ function getRazorpayErrorMessage(error: unknown): string {
   return "Failed to create subscription";
 }
 
+function isDuplicateRazorpayCustomerError(error: unknown): boolean {
+  return getRazorpayErrorMessage(error)
+    .toLowerCase()
+    .includes("customer already exists");
+}
+
+async function findRazorpayCustomerByEmail(
+  razorpay: NonNullable<ReturnType<typeof getRazorpayClient>>,
+  email: string
+): Promise<{ id: string } | null> {
+  const normalizedEmail = email.trim().toLowerCase();
+  let skip = 0;
+  const pageSize = 100;
+
+  for (let page = 0; page < 5; page++) {
+    const list = await razorpay.customers.all({
+      email: normalizedEmail,
+      count: pageSize,
+      skip,
+    });
+
+    const match = list.items?.find(
+      (customer) => customer.email?.trim().toLowerCase() === normalizedEmail
+    );
+    if (match?.id) return { id: match.id };
+
+    if (!list.items?.length || list.items.length < pageSize) break;
+    skip += pageSize;
+  }
+
+  return null;
+}
+
+async function getOrCreateRazorpayCustomer(
+  razorpay: NonNullable<ReturnType<typeof getRazorpayClient>>,
+  params: {
+    restaurantId: string;
+    email: string;
+    phone?: string;
+    name?: string;
+  }
+): Promise<string> {
+  const existing = await findRazorpayCustomerByEmail(razorpay, params.email);
+  if (existing) return existing.id;
+
+  try {
+    const customer = await razorpay.customers.create({
+      email: params.email,
+      contact: params.phone || undefined,
+      name: params.name || params.email.split("@")[0],
+      notes: { restaurant_id: params.restaurantId },
+    });
+    return customer.id;
+  } catch (error) {
+    if (isDuplicateRazorpayCustomerError(error)) {
+      const duplicate = await findRazorpayCustomerByEmail(razorpay, params.email);
+      if (duplicate) return duplicate.id;
+    }
+    throw error;
+  }
+}
+
 /**
  * Create a Razorpay subscription
  */
@@ -97,13 +159,12 @@ export async function createRazorpaySubscription({
     }
 
     if (!customerId) {
-      const customer = await razorpay.customers.create({
+      customerId = await getOrCreateRazorpayCustomer(razorpay, {
+        restaurantId,
         email,
-        contact: phone || undefined,
-        name: name || email.split("@")[0],
-        notes: { restaurant_id: restaurantId },
+        phone,
+        name,
       });
-      customerId = customer.id;
 
       await supabase
         .from("subscriptions")
