@@ -22,19 +22,13 @@ export function getCountryFromHeaders(
 }
 
 /**
- * Resolve checkout currency.
- * Priority: ?currency=inr|usd override → India → USD (default for international / unknown).
+ * Resolve checkout currency from geo headers.
+ * India → INR; all other / unknown countries → USD.
  */
-export function resolveSubscriptionCurrency(options: {
-  countryCode?: string | null;
-  currencyOverride?: string | null;
-}): SubscriptionCurrency {
-  const override = options.currencyOverride?.trim().toLowerCase();
-  if (override === "inr") return "INR";
-  if (override === "usd") return "USD";
-
-  if (options.countryCode?.toUpperCase() === "IN") return "INR";
-
+export function resolveSubscriptionCurrency(
+  countryCode?: string | null
+): SubscriptionCurrency {
+  if (countryCode?.toUpperCase() === "IN") return "INR";
   return "USD";
 }
 

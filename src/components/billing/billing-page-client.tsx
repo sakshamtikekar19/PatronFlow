@@ -55,8 +55,6 @@ export function BillingPageClient({
       try {
         const res = await fetch("/api/billing/razorpay-checkout", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ currency: checkoutCurrency.toLowerCase() }),
         });
         const data = (await res.json()) as {
           subscriptionId?: string;

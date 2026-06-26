@@ -164,7 +164,6 @@ export async function startCheckout(params: {
   phone?: string;
   name?: string;
   countryCode?: string | null;
-  currencyOverride?: string | null;
 }): Promise<{ url: string | null; subscriptionId?: string; error?: string }> {
   if (params.provider === "stripe") {
     return createCheckoutSession({
@@ -176,10 +175,9 @@ export async function startCheckout(params: {
   }
 
   if (params.provider === "razorpay") {
-    const currency: SubscriptionCurrency = resolveSubscriptionCurrency({
-      countryCode: params.countryCode,
-      currencyOverride: params.currencyOverride,
-    });
+    const currency: SubscriptionCurrency = resolveSubscriptionCurrency(
+      params.countryCode
+    );
 
     const result = await createRazorpaySubscription({
       restaurantId: params.restaurantId,

@@ -20,7 +20,6 @@ interface BillingPageProps {
   searchParams: Promise<{
     success?: string;
     cancelled?: string;
-    currency?: string;
   }>;
 }
 
@@ -45,10 +44,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const availableProviders = getAvailableProviders();
   const params = await searchParams;
   const headersList = await headers();
-  const checkoutCurrency = resolveSubscriptionCurrency({
-    countryCode: getCountryFromHeaders(headersList),
-    currencyOverride: params.currency,
-  });
+  const checkoutCurrency = resolveSubscriptionCurrency(
+    getCountryFromHeaders(headersList)
+  );
 
   return (
     <div className="space-y-6">

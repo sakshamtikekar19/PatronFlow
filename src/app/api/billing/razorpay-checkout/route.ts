@@ -31,16 +31,8 @@ export async function POST(request: Request) {
     );
   }
 
-  let currencyOverride: string | null = null;
-  try {
-    const body = (await request.json()) as { currency?: string } | null;
-    currencyOverride = body?.currency ?? null;
-  } catch {
-    // Empty body is valid — currency is resolved from geo headers
-  }
-
   const countryCode = getCountryFromHeaders(request.headers);
-  const currency = resolveSubscriptionCurrency({ countryCode, currencyOverride });
+  const currency = resolveSubscriptionCurrency(countryCode);
 
   const result = await createRazorpaySubscription({
     restaurantId: restaurant.id,
