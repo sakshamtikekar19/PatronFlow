@@ -38,6 +38,17 @@ const serverSchema = z.object({
   // Upstash Redis for rate limiting (optional)
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
+  // Cron job authentication
+  CRON_SECRET: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (process.env.NODE_ENV === "production" && !data.CRON_SECRET?.trim()) {
+    ctx.addIssue({
+      code: "custom",
+      message: "CRON_SECRET is required in production",
+      path: ["CRON_SECRET"],
+    });
+  }
 });
 
 const clientSchema = z.object({

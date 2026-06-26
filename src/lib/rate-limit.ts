@@ -47,6 +47,13 @@ function isUpstashConfigured(): boolean {
   );
 }
 
+if (process.env.NODE_ENV === "production" && !isUpstashConfigured()) {
+  console.error(
+    "SECURITY: UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are not set. " +
+      "Rate limits use per-instance memory and are easy to bypass on serverless."
+  );
+}
+
 function getUpstashLimiter(
   config: RateLimitConfig,
   namespace: string

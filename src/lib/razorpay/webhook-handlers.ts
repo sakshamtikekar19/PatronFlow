@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { updateSubscriptionStatus, recordPayment } from "@/lib/billing";
+import { resolveRestaurantForRazorpaySubscription } from "@/lib/billing/webhook-security";
 import { writeAuditLog } from "@/lib/admin/audit";
 
 export interface RazorpaySubscriptionEntity {
@@ -58,17 +59,7 @@ async function resolveRestaurantId(
   supabase: SupabaseClient,
   subscription: RazorpaySubscriptionEntity
 ): Promise<string | null> {
-  if (subscription.notes?.restaurant_id) {
-    return subscription.notes.restaurant_id;
-  }
-
-  const { data } = await supabase
-    .from("subscriptions")
-    .select("restaurant_id")
-    .eq("provider_subscription_id", subscription.id)
-    .single();
-
-  return data?.restaurant_id ?? null;
+  return resolveRestaurantForRazorpaySubscription(supabase, subscription);
 }
 
 async function resolveRestaurantIdFromPayment(
@@ -76,15 +67,20 @@ async function resolveRestaurantIdFromPayment(
   payment: RazorpayPaymentEntity,
   subscription?: RazorpaySubscriptionEntity
 ): Promise<string | null> {
-  if (payment.notes?.restaurant_id) {
-    return payment.notes.restaurant_id;
-  }
-
   if (subscription) {
-    return resolveRestaurantId(supabase, subscription);
+    return resolveRestaurantForRazorpaySubscription(supabase, subscription);
   }
 
-  return null;
+  const noteRestaurantId = payment.notes?.restaurant_id;
+  if (!noteRestaurantId) return null;
+
+  const { data } = await supabase
+    .from("subscriptions")
+    .select("restaurant_id")
+    .eq("restaurant_id", noteRestaurantId)
+    .maybeSingle();
+
+  return data?.restaurant_id ?? null;
 }
 
 /** Mark subscription active after auth or activation. */

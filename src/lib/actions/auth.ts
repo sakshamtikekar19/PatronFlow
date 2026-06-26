@@ -5,11 +5,30 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPostLoginPath } from "@/lib/security/admin-access";
 import { writeAuditLog } from "@/lib/admin/audit";
+import { checkRateLimit, getClientIp, rateLimiters } from "@/lib/rate-limit";
 
 export interface AuthResult {
   error?: string;
   success?: boolean;
   message?: string;
+}
+
+async function enforceAuthRateLimit(
+  email: string,
+  config: (typeof rateLimiters)["auth"],
+  namespace: string
+): Promise<AuthResult | null> {
+  const ip = await getClientIp();
+  const key = `${ip}:${email.trim().toLowerCase()}`;
+  const rateLimit = await checkRateLimit(key, config, namespace);
+
+  if (!rateLimit.success) {
+    return {
+      error: "Too many attempts. Please wait a minute and try again.",
+    };
+  }
+
+  return null;
 }
 
 export async function login(
@@ -24,6 +43,9 @@ export async function login(
   if (!email || !password) {
     return { error: "Email and password are required" };
   }
+
+  const rateLimited = await enforceAuthRateLimit(email, rateLimiters.auth, "auth-login");
+  if (rateLimited) return rateLimited;
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -56,8 +78,11 @@ export async function signup(
     return { error: "All fields are required" };
   }
 
-  if (password.length < 6) {
-    return { error: "Password must be at least 6 characters" };
+  const rateLimited = await enforceAuthRateLimit(email, rateLimiters.signup, "auth-signup");
+  if (rateLimited) return rateLimited;
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters" };
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -125,6 +150,13 @@ export async function requestPasswordReset(
   if (!email) {
     return { error: "Email is required" };
   }
+
+  const rateLimited = await enforceAuthRateLimit(
+    email,
+    rateLimiters.auth,
+    "auth-password-reset"
+  );
+  if (rateLimited) return rateLimited;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,

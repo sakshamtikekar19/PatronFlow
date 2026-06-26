@@ -68,7 +68,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           type="password"
           placeholder="••••••••"
           required
-          minLength={6}
+          minLength={mode === "signup" ? 8 : 6}
           className="h-11 rounded-xl border-border bg-card"
         />
       </div>

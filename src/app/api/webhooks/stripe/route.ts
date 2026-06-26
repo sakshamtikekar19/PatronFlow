@@ -3,6 +3,10 @@ import Stripe from "stripe";
 import { getStripeClient } from "@/lib/stripe/client";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { updateSubscriptionStatus, recordPayment } from "@/lib/billing";
+import {
+  resolveRestaurantForStripeSubscription,
+  validateStripeCheckoutSession,
+} from "@/lib/billing/webhook-security";
 
 /**
  * Stripe Webhook Handler
@@ -55,15 +59,22 @@ export async function POST(request: Request) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const restaurantId = session.metadata?.restaurant_id;
+        const stripeSubscriptionId = session.subscription as string | null;
 
-        if (restaurantId && session.subscription) {
-          // Subscription created via checkout
+        if (restaurantId && stripeSubscriptionId) {
+          const allowed = await validateStripeCheckoutSession(
+            supabase,
+            restaurantId,
+            stripeSubscriptionId
+          );
+          if (!allowed) break;
+
           await supabase
             .from("subscriptions")
             .update({
               status: "active",
               provider: "stripe",
-              provider_subscription_id: session.subscription as string,
+              provider_subscription_id: stripeSubscriptionId,
               current_period_start: new Date().toISOString(),
             })
             .eq("restaurant_id", restaurantId);
@@ -74,7 +85,10 @@ export async function POST(request: Request) {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        const restaurantId = subscription.metadata?.restaurant_id;
+        const restaurantId = await resolveRestaurantForStripeSubscription(
+          supabase,
+          subscription
+        );
 
         if (restaurantId) {
           let status: "active" | "past_due" | "cancelled" = "active";
@@ -113,7 +127,10 @@ export async function POST(request: Request) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const restaurantId = subscription.metadata?.restaurant_id;
+        const restaurantId = await resolveRestaurantForStripeSubscription(
+          supabase,
+          subscription
+        );
 
         if (restaurantId) {
           await updateSubscriptionStatus(restaurantId, "cancelled", {
