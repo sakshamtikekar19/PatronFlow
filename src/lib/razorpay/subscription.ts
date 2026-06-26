@@ -49,17 +49,18 @@ async function findRazorpayCustomerByEmail(
 
   for (let page = 0; page < 5; page++) {
     const list = await razorpay.customers.all({
-      email: normalizedEmail,
       count: pageSize,
       skip,
-    });
+    } as { count: number; skip: number });
 
-    const match = list.items?.find(
-      (customer) => customer.email?.trim().toLowerCase() === normalizedEmail
+    const items = list.items ?? [];
+    const match = items.find(
+      (customer: { id?: string; email?: string | null }) =>
+        customer.email?.trim().toLowerCase() === normalizedEmail
     );
     if (match?.id) return { id: match.id };
 
-    if (!list.items?.length || list.items.length < pageSize) break;
+    if (items.length < pageSize) break;
     skip += pageSize;
   }
 
